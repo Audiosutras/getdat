@@ -7,11 +7,10 @@ readme = "README.md"
 packages = [{include = "getdat", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 click = "^8.1.7"
 requests = "^2.31.0"
 bs4 = "^0.0.1"
-tqdm = "^4.66.1"
 
 [tool.poetry.scripts]
 getdat = "getdat.main:cli"
