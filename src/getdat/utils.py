@@ -9,7 +9,7 @@ class Ebook:
     source_options = {
         "annas_archive": {
             "name": "Anna's Archive",
-            "url": "https://annas-archive.org/search?q=",
+            "url": "https://annas-archive.org/",
             "search-1-scrape": {
                 "tag": "a",
                 "tag_is_link": True,
@@ -39,20 +39,22 @@ class Ebook:
         source_dict = self.source_options.get(self.source)
         return source_dict.get(key)
 
-    def _get_url(self) -> str:
+    def _get_url(self, *args, **kwargs) -> str:
+        url = self._source_info("url")
         match self.source:
             case "annas_archive":
-                search = ' '.join(map(str, self.q))
-                if self.ext:
-                     search += f'&ext={self.ext}'
-                url = self._source_info("url")
-                return f"{url}{search}"
+                if not kwargs.get("uri"):
+                    search = f'search?q={' '.join(map(str, self.q))}'
+                    if self.ext:
+                        search += f'&ext={self.ext}'
+                    return f"{url}{search}"
+                return f"{url}{kwargs.get("uri")}"
     
-    def _get(self):
+    def _get(self, *args, **kwargs):
         source_name = self._source_info("name")
         click.echo(f"\nSearching {source_name}...")
         click.echo("")
-        return requests.get(self._get_url())
+        return requests.get(self._get_url(*args, **kwargs))
     
     def _scrape(self, scrape_key, response):
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -67,7 +69,7 @@ class Ebook:
         for idx, el in enumerate(soup.find_all(tag, class_=tag_class)):
             title = el.find(tag_title_container, class_=class_title_container).string
             if tag_is_link:
-                search_results[idx + 1] = {
+                search_results[str(idx + 1)] = {
                     "title": title,
                     "link": el["href"]
                 }
@@ -76,7 +78,7 @@ class Ebook:
 
 
     
-    def run(self):
+    def run(self, *args, **kwargs):
         if self.browser:
             return open_new_tab(self._get_url())
         response = self._get()
@@ -89,6 +91,12 @@ class Ebook:
             value = search_results.get(key)
             title = value.get("title")
             click.echo(f"{key}. {title}")
-        click.echo("")
+
+        value = click.prompt("Select", type=click.IntRange(min=1, max=len(search_results)))
+        selection_uri = search_results.get(str(value)).get("link")
+        kwargs["uri"] = selection_uri
+        url = self._get_url(**kwargs)
+        open_new_tab(url)
+        
             
     
