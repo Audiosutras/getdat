@@ -2,7 +2,6 @@ import click
 import requests
 from webbrowser import open_new_tab
 from bs4 import BeautifulSoup
-from tqdm import tqdm
 
 
 class Ebook:
