@@ -55,7 +55,7 @@ class AnnasEbook:
         click.echo("")
         return requests.get(self._get_url(*args, **kwargs))
     
-    def _scrape(self, response: object) -> dict:
+    def _scrape(self, response: requests.models.Response) -> dict:
         soup = BeautifulSoup(response.content, 'html.parser')
         scrape = self._source_info(key=self._scrape_key)
         tag = scrape.get("tag")
