@@ -51,6 +51,8 @@ class AnnasEbook:
                     search += f'&ext={self.ext}'
                 return f"{url}{search}"
             case _:
+                if any(protocal in self._selected_result.get("link") for protocal in ['https://', 'http://']):
+                    return self._selected_result.get("link")
                 return f"{url}{self._selected_result.get("link")}"
     
     def _get(self, *args, **kwargs):
@@ -137,7 +139,7 @@ class AnnasEbook:
         click.echo("")
         return have_results
     
-    def _scrape_page_results(self, *args, **kwargs) -> int:
+    def _scrape_page(self, *args, **kwargs) -> int:
         response = self._get(*args, **kwargs)
         results = self._scrape(response)
         have_results = self._echo_results(results)
@@ -146,9 +148,13 @@ class AnnasEbook:
             self._selected_result = results.get(str(value))
             selected_link = self._selected_result.get("link")
             return value
+    
+    def _download_selected_result(self, *args, **kwargs):
+        response = self._get(*args, **kwargs)
+        click.echo(response)
 
     def run(self, *args, **kwargs):
-        value = self._scrape_page_results(*args, **kwargs)
+        value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return open_new_tab(self._selected_result.get("link"))
         click.echo("")
@@ -158,8 +164,9 @@ class AnnasEbook:
         self._scrape_key = "detail_page_scrape"
         click.echo(click.style("==============", fg="magenta"))
         self._msg = "for download links..."
-        value = self._scrape_page_results(*args, **kwargs)
+        value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return open_new_tab(self._selected_result.get("link"))
+        self._download_selected_result(*args, **kwargs)
         
     
