@@ -1,5 +1,7 @@
 import click
-import requests
+from requests import get
+from requests.exceptions import ConnectionError
+from requests.models import Response
 from webbrowser import open_new_tab
 from bs4 import BeautifulSoup
 
@@ -53,17 +55,17 @@ class AnnasEbook:
     
     def _get(self, *args, **kwargs):
         source_name = self._source_info("name")
-        click.echo(f"\nSearching {source_name}{self._msg}")
+        click.echo(f"\nSearching {source_name} {self._msg}")
         click.echo("")
         try:
-            response = requests.get(self._get_url(*args, **kwargs))
-        except requests.exceptions.ConnectionError:
+            response = get(self._get_url(*args, **kwargs))
+        except ConnectionError:
             click.echo("No connection established to Anna's Archive")
             click.echo("")
         else:
             return response
 
-    def _scrape(self, response: requests.models.Response) -> dict:
+    def _scrape(self, response: Response) -> dict:
         soup = BeautifulSoup(response.content, 'html.parser')
         scrape = self._source_info(key=self._scrape_key)
         tag = scrape.get("tag")
