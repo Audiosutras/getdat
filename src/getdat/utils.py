@@ -29,8 +29,9 @@ class AnnasEbook:
             "class": "js-download-link"
         }
     }
-    _scrape_key = "search_page_scrape"
-    _return_selected_result = True
+    _scrape_key = "search_page_scrape"    
+    _selected_result = {}
+    _msg = "for search results..."
 
     def __init__(self, q: tuple,  ext: str):
         self.q = q
@@ -41,20 +42,27 @@ class AnnasEbook:
 
     def _get_url(self, *args, **kwargs) -> str:
         url = self._source_info("url")
-        if not kwargs.get("uri"):
-            search = f'/search?q={' '.join(map(str, self.q))}'
-            if self.ext:
-                search += f'&ext={self.ext}'
-            return f"{url}{search}"
-        return f"{url}{kwargs.get("uri")}"
+        match self._scrape_key:
+            case "search_page_scrape":
+                search = f'/search?q={' '.join(map(str, self.q))}'
+                if self.ext:
+                    search += f'&ext={self.ext}'
+                return f"{url}{search}"
+            case _:
+                return f"{url}{self._selected_result.get("link")}"
     
     def _get(self, *args, **kwargs):
-        msg = kwargs.get("msg", "...")
         source_name = self._source_info("name")
-        click.echo(f"\nSearching {source_name}{msg}")
+        click.echo(f"\nSearching {source_name}{self._msg}")
         click.echo("")
-        return requests.get(self._get_url(*args, **kwargs))
-    
+        try:
+            response = requests.get(self._get_url(*args, **kwargs))
+        except requests.exceptions.ConnectionError:
+            click.echo("No connection established to Anna's Archive")
+            click.echo("")
+        else:
+            return response
+
     def _scrape(self, response: requests.models.Response) -> dict:
         soup = BeautifulSoup(response.content, 'html.parser')
         scrape = self._source_info(key=self._scrape_key)
@@ -70,18 +78,21 @@ class AnnasEbook:
                     title = el.find(tag_title_container, class_=class_title_container).string
                     results[str(idx + 1)] = {
                         "title": title,
-                        "link": el["href"]
+                        "link": el["href"],
+                        "value": idx + 1
                     }
             case "detail_page_scrape":
                 for idx, el in enumerate(soup.find_all(tag, class_=tag_class)):
                     if el.string != 'Bulk torrent downloads':
                         results[str(idx + 1)] = {
                             "title": el.string,
-                            "link": el["href"]
+                            "link": el["href"],
+                            "value": idx + 1
                         }
         results["0"] = {
             "title": "Continue In Browser",
-            "link": response.url
+            "link": response.url,
+            "value": 0
         }
         return results
     
@@ -91,7 +102,7 @@ class AnnasEbook:
             try:
                 [lang, ext, size, title] = title_list
             except ValueError:
-                return click.echo(f" {key} | Could not be rendered")
+                return click.echo(click.style(f" {key} | Entry could not be parsed", fg="red"))
             return click.echo(f" {key} | {title} | {ext} | {size} | {lang}")
     
     def _echo_results(self, results) -> bool:
@@ -124,30 +135,29 @@ class AnnasEbook:
         click.echo("")
         return have_results
     
-    def _scrape_page_results(self, *args, **kwargs):
+    def _scrape_page_results(self, *args, **kwargs) -> int:
         response = self._get(*args, **kwargs)
         results = self._scrape(response)
         have_results = self._echo_results(results)
         if have_results:
             value = click.prompt("Select Number", type=click.IntRange(min=0, max=(len(results) - 1)))
-            selected_result = results.get(str(value))
-            selected_link = selected_result.get("link")
-            if value == 0:
-                return open_new_tab(selected_link)
-            if self._return_selected_result:
-                return [value, selected_result]
+            self._selected_result = results.get(str(value))
+            selected_link = self._selected_result.get("link")
+            return value
 
     def run(self, *args, **kwargs):
-        search_page_value, selected_result = self._scrape_page_results(*args, **kwargs)
+        value = self._scrape_page_results(*args, **kwargs)
+        if value == 0:
+            return open_new_tab(self._selected_result.get("link"))
         click.echo("")
         click.echo(click.style("Selected", fg="magenta"))
         click.echo("")
-        self._echo_formatted_title(search_page_value, selected_result.get("title"))
+        self._echo_formatted_title(self._selected_result.get("value"), self._selected_result.get("title"))
         self._scrape_key = "detail_page_scrape"
-        self._return_selected_result = False
         click.echo(click.style("==============", fg="magenta"))
-        kwargs["uri"] = selected_result.get("link")
-        kwargs["msg"] = " for download links..."
-        self._scrape_page_results(*args, **kwargs)
+        self._msg = "for download links..."
+        value = self._scrape_page_results(*args, **kwargs)
+        if value == 0:
+            return open_new_tab(self._selected_result.get("link"))
         
     
