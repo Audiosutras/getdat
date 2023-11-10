@@ -57,10 +57,6 @@ class AnnasEbook:
         tag_class = scrape.get("class")
         tag_is_link = scrape.get("tag_is_link", False)
         search_results = dict()
-        search_results["0"] = {
-            "title": "Continue In Browser",
-            "link": response.url
-        }
         match scrape_key:
             case "search-1-scrape":
                 title_container = scrape.get("title_container")
@@ -73,6 +69,10 @@ class AnnasEbook:
                             "title": title,
                             "link": el["href"]
                         }
+        search_results["0"] = {
+            "title": "Continue In Browser",
+            "link": response.url
+        }
         return search_results
     
     def _echo_results(self, search_results) -> bool:
@@ -83,14 +83,20 @@ class AnnasEbook:
             return are_search_results
         click.echo(click.style("Search Results", fg="magenta"))
         click.echo(click.style("==============", fg="magenta"))
+        click.echo("*Table Key: Number | Title | Ext | Size | Lang")
         click.echo("")
         for key in search_results.keys():
             value = search_results.get(key)
-            title = value.get("title")
+            title= value.get("title")
             if key == "0":
-                click.echo(click.style(f"{key}. {title}", blink=True, fg="magenta"))
+                click.echo("")
+                click.echo(
+                    click.style(f" {key} | {title}", blink=True)
+                )
             else:
-                click.echo(click.style(f"{key}. {title}", fg="cyan"))
+                title_list = title.split(", ", 3)
+                [lang, ext, size, title] = title_list
+                click.echo(f" {key} | {title} | {ext} | {size} | {lang}")
         click.echo("")
         click.echo(click.style("==============", fg="magenta"))
         click.echo("")
