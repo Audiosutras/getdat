@@ -9,9 +9,8 @@ class AnnasEbook:
     _source_dict = {
             "name": "Anna's Archive",
             "url": "https://annas-archive.org",
-            "search-1-scrape": {
+            "search_page_scrape": {
                 "tag": "a",
-                "tag_is_link": True,
                 "class": (
                     "js-vim-focus custom-a flex items-center "
                     "relative left-[-10px] w-[calc(100%+20px)] px-[10px] "
@@ -24,6 +23,10 @@ class AnnasEbook:
                         "line-clamp-[2] leading-[1.2] text-[10px] lg:text-xs text-gray-500"
                     )
                 }
+            },
+            "detail_page_scrape": {
+                "tag": "a",
+                "class": "js-download-link"
             }
         }
 
@@ -55,25 +58,32 @@ class AnnasEbook:
         scrape = self._source_info(key=scrape_key)
         tag = scrape.get("tag")
         tag_class = scrape.get("class")
-        tag_is_link = scrape.get("tag_is_link", False)
         search_results = dict()
         match scrape_key:
-            case "search-1-scrape":
+            case "search_page_scrape":
                 title_container = scrape.get("title_container")
                 tag_title_container = title_container.get("tag")
                 class_title_container = title_container.get("class")
                 for idx, el in enumerate(soup.find_all(tag, class_=tag_class)):
                     title = el.find(tag_title_container, class_=class_title_container).string
-                    if tag_is_link:
-                        search_results[str(idx + 1)] = {
-                            "title": title,
-                            "link": el["href"]
-                        }
+                    search_results[str(idx + 1)] = {
+                        "title": title,
+                        "link": el["href"]
+                    }
+            case "detail_page_scrape":
+                for idx, el in enumerate(soup.find_all(tag, class_=tag_class)):
+                    click.echo(el["href"])
         search_results["0"] = {
             "title": "Continue In Browser",
             "link": response.url
         }
         return search_results
+    
+    @staticmethod
+    def _echo_formatted_title(key, title):
+            title_list = title.split(", ", 3)
+            [lang, ext, size, title] = title_list
+            return click.echo(f" {key} | {title} | {ext} | {size} | {lang}")
     
     def _echo_results(self, search_results) -> bool:
         are_search_results = True
@@ -83,7 +93,6 @@ class AnnasEbook:
             return are_search_results
         click.echo(click.style("Search Results", fg="magenta"))
         click.echo(click.style("==============", fg="magenta"))
-        click.echo("*Table Key: Number | Title | Ext | Size | Lang")
         click.echo("")
         for key in search_results.keys():
             value = search_results.get(key)
@@ -94,28 +103,32 @@ class AnnasEbook:
                     click.style(f" {key} | {title}", blink=True)
                 )
             else:
-                title_list = title.split(", ", 3)
-                [lang, ext, size, title] = title_list
-                click.echo(f" {key} | {title} | {ext} | {size} | {lang}")
+                self._echo_formatted_title(key, title)
         click.echo("")
-        click.echo(click.style("==============", fg="magenta"))
         click.echo("")
         return are_search_results
 
     
     def run(self, *args, **kwargs):
-        response = self._get()
-        search_results = self._scrape("search-1-scrape", response)
+        search_page_response = self._get()
+        search_results = self._scrape("search_page_scrape", search_page_response)
         are_search_results = self._echo_results(search_results)
         if are_search_results:
             value = click.prompt("Select Number", type=click.IntRange(min=0, max=(len(search_results) - 1)))
-            value_link = search_results.get(str(value)).get("link")
+            selected_search_result = search_results.get(str(value))
+            value_link = selected_search_result.get("link")
             if value == 0:
                 return open_new_tab(value_link)
+            click.echo("")
+            click.echo(click.style("Selected", fg="magenta"))
+            click.echo("")
+            title = selected_search_result.get("title")
+            self._echo_formatted_title(value, title)
+            click.echo(click.style("==============", fg="magenta"))
             kwargs["uri"] = value_link
-            kwargs["msg"] = "for download links..."
-            url = self._get_url(**kwargs)
-            click.echo(url)
+            kwargs["msg"] = " for download links..."
+            detail_page_response = self._get(**kwargs)
+            search_results = self._scrape("detail_page_scrape", detail_page_response)
    
             
     
