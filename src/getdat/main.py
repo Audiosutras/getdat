@@ -1,5 +1,5 @@
 import click
-from .utils import Ebook
+from .utils import AnnasEbook
 
 @click.group()
 def cli():
@@ -9,28 +9,15 @@ def cli():
 
 @cli.command()
 @click.option(
-    '-b',
-    '--browser',
-    is_flag=True,
-    help="Continue search in your default browser"
-)
-@click.option(
     '-e',
     '--ext',
     type=click.Choice(['epub', 'pdf']),
     default="epub",
     help="Preferred Ebook extension"
 )
-@click.option(
-    '-s',
-    '--source',
-    type=click.Choice(['annas_archive']),
-    default="annas_archive",
-    help="Website you would like to use for your search",
-)
 @click.argument('q', nargs=-1)
-def ebook(q, source, ext, browser):
-    """Search for a particular ebook."""
-    ebook = Ebook(q=q, source=source, ext=ext, browser=browser)
+def ebook(q, ext):
+    """Search for a particular ebook using Anna's Archive"""
+    ebook = AnnasEbook(q=q, ext=ext)
     ebook.run()
 
