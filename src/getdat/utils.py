@@ -72,7 +72,11 @@ class AnnasEbook:
                     }
             case "detail_page_scrape":
                 for idx, el in enumerate(soup.find_all(tag, class_=tag_class)):
-                    click.echo(el["href"])
+                    if el.string != 'Bulk torrent downloads':
+                        search_results[str(idx + 1)] = {
+                            "title": el.string,
+                            "link": el["href"]
+                        }
         search_results["0"] = {
             "title": "Continue In Browser",
             "link": response.url
@@ -85,7 +89,7 @@ class AnnasEbook:
             [lang, ext, size, title] = title_list
             return click.echo(f" {key} | {title} | {ext} | {size} | {lang}")
     
-    def _echo_results(self, search_results) -> bool:
+    def _echo_results(self, search_results, scrape_key) -> bool:
         are_search_results = True
         if len(search_results.keys()) == 1:
             click.echo("No Search Results Found")
@@ -102,6 +106,13 @@ class AnnasEbook:
                 click.echo(
                     click.style(f" {key} | {title}", blink=True)
                 )
+            elif scrape_key == "detail_page_scrape":
+                if 'Fast Partner Server' in title:
+                    click.echo(f" {key} | {title} - (Continue in Browser / Requires Member Login)")
+                elif 'Slow Partner Server' in title:
+                    click.echo(f" {key} | {title} - (Continue in Browser / Browser Verification)")
+                else:
+                    click.echo(f" {key} | {title}")
             else:
                 self._echo_formatted_title(key, title)
         click.echo("")
@@ -112,7 +123,7 @@ class AnnasEbook:
     def run(self, *args, **kwargs):
         search_page_response = self._get()
         search_results = self._scrape("search_page_scrape", search_page_response)
-        are_search_results = self._echo_results(search_results)
+        are_search_results = self._echo_results(search_results, "search_page_scrape")
         if are_search_results:
             value = click.prompt("Select Number", type=click.IntRange(min=0, max=(len(search_results) - 1)))
             selected_search_result = search_results.get(str(value))
@@ -128,7 +139,13 @@ class AnnasEbook:
             kwargs["uri"] = value_link
             kwargs["msg"] = " for download links..."
             detail_page_response = self._get(**kwargs)
-            search_results = self._scrape("detail_page_scrape", detail_page_response)
-   
+            dl_links_results = self._scrape("detail_page_scrape", detail_page_response)
+            are_dl_links_results = self._echo_results(dl_links_results, "detail_page_scrape")
+            if are_dl_links_results:
+                value = click.prompt("Select Number", type=click.IntRange(min=0, max=(len(dl_links_results) - 1)))
+                selected_dl_result = dl_links_results.get(str(value))
+                value_link = selected_dl_result.get("link")
+                if value == 0:
+                    return open_new_tab(value_link)
             
     
