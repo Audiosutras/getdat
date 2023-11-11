@@ -7,6 +7,9 @@ from bs4 import BeautifulSoup
 
 
 class AnnasEbook:
+
+    _EXPECTED_DL_CONTENT_TYPES = ('application/epub+zip', )
+    _IPFS = 'ipfs'
     
     _source_dict = {
         "name": "Anna's Archive",
@@ -29,11 +32,9 @@ class AnnasEbook:
         "detail_page_scrape": {
             "tag": "a",
             "class": "js-download-link"
-        },
-        "download_page": {
-            "tag": "a"
         }
     }
+    _DOWNLOAD_PAGE = 'download_page'
     _browser = "Continue in Browser"
     _scrape_key = "search_page_scrape"    
     _selected_result = {}
@@ -42,6 +43,12 @@ class AnnasEbook:
     def __init__(self, q: tuple,  ext: str):
         self.q = ' '.join(map(str, q))
         self.ext = ext
+    
+    def _determine_link(self) -> str:
+        url = self._source_dict.get("url")
+        if any(protocal in self._selected_result.get("link") for protocal in ['https://', 'http://']):
+            return self._selected_result.get("link")
+        return f"{url}{self._selected_result.get("link")}"
 
     def _get_url(self, *args, **kwargs) -> str:
         url = self._source_dict.get("url")
@@ -52,9 +59,7 @@ class AnnasEbook:
                     search += f'&ext={self.ext}'
                 return f"{url}{search}"
             case _:
-                if any(protocal in self._selected_result.get("link") for protocal in ['https://', 'http://']):
-                    return self._selected_result.get("link")
-                return f"{url}{self._selected_result.get("link")}"
+                return self._determine_link()
     
     def _get(self, *args, **kwargs):
         click.echo(click.style(f"\n{self._msg}", fg="bright_yellow"))
@@ -69,9 +74,9 @@ class AnnasEbook:
 
     def _scrape_or_download(self, response: Response) -> dict:
         soup = BeautifulSoup(response.content, 'html.parser')
-        scrape = self._source_dict.get(self._scrape_key)
-        tag = scrape.get("tag")
-        tag_class = scrape.get("class")
+        scrape = self._source_dict.get(self._scrape_key, {})
+        tag = scrape.get("tag", "")
+        tag_class = scrape.get("class", "")
         results = dict()
         match self._scrape_key:
             case "search_page_scrape":
@@ -93,6 +98,11 @@ class AnnasEbook:
                             "link": el["href"],
                             "value": idx + 1
                         }
+            case self._DOWNLOAD_PAGE:
+                if self._browser in self._selected_result.get("title"):
+                    return {}                
+                elif response.headers.get("Content-Type") in self._EXPECTED_DL_CONTENT_TYPES:
+                    click.echo("download logic here")
         results["0"] = {
             "title": self._browser,
             "link": response.url,
@@ -113,6 +123,9 @@ class AnnasEbook:
         have_results = True
         if len(results.keys()) == 1:
             click.echo("No Search Results Found")
+            have_results = False
+            return have_results
+        if len(results.keys()) == 0:
             have_results = False
             return have_results
         click.echo(click.style("Search Results", fg="bright_cyan"))
@@ -147,6 +160,11 @@ class AnnasEbook:
             self._selected_result = results.get(str(value))
             selected_link = self._selected_result.get("link")
             return value
+        else: 
+            # No results because we are the download step and the selected result
+            # instructs us to continue in the Browser 
+            link = self._determine_link()
+            open_new_tab(link)
 
     def run(self, *args, **kwargs):
         self._msg = f"Searching Anna's Archive: {self.q}"
@@ -163,5 +181,8 @@ class AnnasEbook:
         self._msg = "Fetching Download Links..."
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
-            return open_new_tab(self._selected_result.get("link"))        
+            return open_new_tab(self._selected_result.get("link")) 
+        self._scrape_key = self._DOWNLOAD_PAGE
+        self._msg = "Downloading..."
+        self._scrape_page(*args, **kwargs)      
     
