@@ -29,6 +29,9 @@ class AnnasEbook:
         "detail_page_scrape": {
             "tag": "a",
             "class": "js-download-link"
+        },
+        "download_page": {
+            "tag": "a"
         }
     }
     _browser = "Continue in Browser"
@@ -37,14 +40,14 @@ class AnnasEbook:
     _msg = "Searching Anna's Archive..."
 
     def __init__(self, q: tuple,  ext: str):
-        self.q = q
+        self.q = ' '.join(map(str, q))
         self.ext = ext
 
     def _get_url(self, *args, **kwargs) -> str:
         url = self._source_dict.get("url")
         match self._scrape_key:
             case "search_page_scrape":
-                search = f'/search?q={' '.join(map(str, self.q))}'
+                search = f'/search?q={self.q}'
                 if self.ext:
                     search += f'&ext={self.ext}'
                 return f"{url}{search}"
@@ -54,7 +57,7 @@ class AnnasEbook:
                 return f"{url}{self._selected_result.get("link")}"
     
     def _get(self, *args, **kwargs):
-        click.echo(f"\n{self._msg}")
+        click.echo(click.style(f"\n{self._msg}", fg="bright_yellow"))
         click.echo("")
         try:
             response = get(self._get_url(*args, **kwargs))
@@ -64,7 +67,7 @@ class AnnasEbook:
         else:
             return response
 
-    def _scrape(self, response: Response) -> dict:
+    def _scrape_or_download(self, response: Response) -> dict:
         soup = BeautifulSoup(response.content, 'html.parser')
         scrape = self._source_dict.get(self._scrape_key)
         tag = scrape.get("tag")
@@ -103,7 +106,7 @@ class AnnasEbook:
             try:
                 [lang, ext, size, title] = title_list
             except ValueError:
-                return click.echo(click.style(f" {key} | Entry could not be parsed", fg="red"))
+                return click.echo(click.style(f" {key} | Entry information could not be displayed", fg="bright_red"))
             return click.echo(f" {key} | {title} | {ext} | {size} | {lang}")
     
     def _echo_results(self, results) -> bool:
@@ -112,8 +115,8 @@ class AnnasEbook:
             click.echo("No Search Results Found")
             have_results = False
             return have_results
-        click.echo(click.style("Search Results", fg="magenta"))
-        click.echo(click.style("==============", fg="magenta"))
+        click.echo(click.style("Search Results", fg="bright_cyan"))
+        click.echo(click.style("==============", fg="bright_cyan"))
         click.echo("")
         for key in results.keys():
             value = results.get(key)
@@ -137,37 +140,28 @@ class AnnasEbook:
     
     def _scrape_page(self, *args, **kwargs) -> int:
         response = self._get(*args, **kwargs)
-        results = self._scrape(response)
+        results = self._scrape_or_download(response)
         have_results = self._echo_results(results)
         if have_results:
             value = click.prompt("Select Number", type=click.IntRange(min=0, max=(len(results) - 1)))
             self._selected_result = results.get(str(value))
             selected_link = self._selected_result.get("link")
             return value
-    
-    def _download_selected_result(self, *args, **kwargs):
-        title = self._selected_result.get("title")
-        click.echo(title)
-        if self._browser in title:
-            return open_new_tab(f"{self._source_dict.get("url")}{self._selected_result.get("link")}")
-        response = self._get(*args, **kwargs)
-        click.echo(response)
 
     def run(self, *args, **kwargs):
+        self._msg = f"Searching Anna's Archive: {self.q}"
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return open_new_tab(self._selected_result.get("link"))
         click.echo("")
         click.echo("")
-        click.echo(click.style("Selected", fg="magenta"))
+        click.echo(click.style("Selected", fg="bright_cyan"))
         click.echo("")
         self._echo_formatted_title(self._selected_result.get("value"), self._selected_result.get("title"))
         self._scrape_key = "detail_page_scrape"
-        click.echo(click.style("==============", fg="magenta"))
+        click.echo(click.style("==============", fg="bright_cyan"))
         self._msg = "Fetching Download Links..."
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
-            return open_new_tab(self._selected_result.get("link"))
-        self._download_selected_result(*args, **kwargs)
-        
+            return open_new_tab(self._selected_result.get("link"))        
     
