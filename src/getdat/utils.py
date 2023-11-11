@@ -7,7 +7,14 @@ from bs4 import BeautifulSoup
 
 
 class AnnasEbook:
-
+    
+    _FAST_PARTNER_SERVER = 'Fast Partner Server'
+    _SLOW_PARTNER_SERVER = 'Slow Partner Server'
+    _Z_LIBRARY = 'Z-Library'
+    _MEMBER_LOGIN_REQUIRED = (
+        _FAST_PARTNER_SERVER,
+        _Z_LIBRARY
+    )
     _EXPECTED_DL_CONTENT_TYPES = ('application/epub+zip', )
     _IPFS = 'ipfs'
     
@@ -34,7 +41,6 @@ class AnnasEbook:
             "class": "js-download-link"
         }
     }
-    _DOWNLOAD_PAGE = 'download_page'
     _browser = "Continue in Browser"
     _scrape_key = "search_page_scrape"    
     _selected_result = {}
@@ -46,9 +52,10 @@ class AnnasEbook:
     
     def _determine_link(self) -> str:
         url = self._source_dict.get("url")
+        link = self._selected_result.get("link")
         if any(protocal in self._selected_result.get("link") for protocal in ['https://', 'http://']):
-            return self._selected_result.get("link")
-        return f"{url}{self._selected_result.get("link")}"
+            return link
+        return f"{url}{link}"
 
     def _get_url(self, *args, **kwargs) -> str:
         url = self._source_dict.get("url")
@@ -98,11 +105,6 @@ class AnnasEbook:
                             "link": el["href"],
                             "value": idx + 1
                         }
-            case self._DOWNLOAD_PAGE:
-                if self._browser in self._selected_result.get("title"):
-                    return {}                
-                elif response.headers.get("Content-Type") in self._EXPECTED_DL_CONTENT_TYPES:
-                    click.echo("download logic here")
         results["0"] = {
             "title": self._browser,
             "link": response.url,
@@ -140,10 +142,10 @@ class AnnasEbook:
                     click.style(f" {key} | {title}", blink=True)
                 )
             elif self._scrape_key == "detail_page_scrape":
-                if 'Fast Partner Server' in title:
-                    click.echo(f" {key} | {title} - ({self._browser} / Requires Member Login)")
-                elif 'Slow Partner Server' in title:
-                    click.echo(f" {key} | {title} - ({self._browser} / Browser Verification)")
+                if any( dl_partner in title for dl_partner in self._MEMBER_LOGIN_REQUIRED):
+                    click.echo(f" {key} | {title} - (Requires Member Login / {self._browser})")
+                elif self._SLOW_PARTNER_SERVER in title:
+                    click.echo(f" {key} | {title} - (Browser Verification / {self._browser})")
                 else:
                     click.echo(f" {key} | {title}")
             else:
@@ -160,11 +162,12 @@ class AnnasEbook:
             self._selected_result = results.get(str(value))
             selected_link = self._selected_result.get("link")
             return value
-        else: 
-            # No results because we are the download step and the selected result
-            # instructs us to continue in the Browser 
-            link = self._determine_link()
-            open_new_tab(link)
+    
+    def _dl_or_launch_page(self, *args, **kwargs):
+        title = self._selected_result.get("title")
+        self._msg = f"Downloading from {title}..."
+        response = self._get(*args, **kwargs)
+        click.echo(response.__dict__.keys())
 
     def run(self, *args, **kwargs):
         self._msg = f"Searching Anna's Archive: {self.q}"
@@ -182,7 +185,5 @@ class AnnasEbook:
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return open_new_tab(self._selected_result.get("link")) 
-        self._scrape_key = self._DOWNLOAD_PAGE
-        self._msg = "Downloading..."
-        self._scrape_page(*args, **kwargs)      
+        self._dl_or_launch_page(*args, **kwargs)      
     
