@@ -174,7 +174,7 @@ class AnnasEbook:
     def _dl_or_launch_page(self, *args, **kwargs):
         title = self._selected_result.get("title")
         link = self._determine_link()
-        self._msg = f"Downloading from {title}..."
+        self._msg = f"Talking to {title}..."
         kwargs["is_download"] = True
         try:
             response = self._get(*args, **kwargs)
@@ -184,6 +184,16 @@ class AnnasEbook:
             content_type = response.headers.get("Content-Type")
             if content_type in self._EXPECTED_DL_CONTENT_TYPES:
                 return click.echo("download content here")
+            elif (
+                content_type == self._HTML_CONTENT_TYPE and
+                self._IPFS in link 
+            ):
+                return click.echo(
+                    click.style(
+                        f"Direct Download Not Available from {title}.\n Try Another Download Link", 
+                        fg="red"
+                    )
+                ) 
             else: # Browser Only Options
                 open_new_tab(link)
 
