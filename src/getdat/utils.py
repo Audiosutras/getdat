@@ -15,7 +15,12 @@ class AnnasEbook:
         _FAST_PARTNER_SERVER,
         _Z_LIBRARY
     )
-    _EXPECTED_DL_CONTENT_TYPES = ('application/epub+zip', )
+    _HTML_CONTENT_TYPE = 'text/html'
+    _PDF_CONTENT_TYPE = 'application/pdf'
+    _EPUB_CONTENT_TYPE = 'application/epub+zip'
+    _EXPECTED_DL_CONTENT_TYPES = (
+        _PDF_CONTENT_TYPE, _EPUB_CONTENT_TYPE
+    )
     _IPFS = 'ipfs'
     
     _source_dict = {
@@ -73,9 +78,12 @@ class AnnasEbook:
         click.echo("")
         try:
             response = get(self._get_url(*args, **kwargs))
-        except ConnectionError:
-            click.echo("No connection established to Anna's Archive")
-            click.echo("")
+        except ConnectionError as e:
+            is_download = kwargs.get("is_download", False)
+            if is_download:
+                click.echo(click.style("No connection established", fg="bright_red"))
+                raise e
+            return click.echo(click.style("No connection established", fg="bright_red"))
         else:
             return response
 
@@ -165,9 +173,19 @@ class AnnasEbook:
     
     def _dl_or_launch_page(self, *args, **kwargs):
         title = self._selected_result.get("title")
+        link = self._determine_link()
         self._msg = f"Downloading from {title}..."
-        response = self._get(*args, **kwargs)
-        click.echo(response.__dict__.keys())
+        kwargs["is_download"] = True
+        try:
+            response = self._get(*args, **kwargs)
+        except ConnectionError:
+            return open_new_tab(link)
+        else:
+            content_type = response.headers.get("Content-Type")
+            if content_type in self._EXPECTED_DL_CONTENT_TYPES:
+                return click.echo("download content here")
+            else: # Browser Only Options
+                open_new_tab(link)
 
     def run(self, *args, **kwargs):
         self._msg = f"Searching Anna's Archive: {self.q}"
@@ -185,5 +203,6 @@ class AnnasEbook:
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return open_new_tab(self._selected_result.get("link")) 
+        self._scrape_key = ""
         self._dl_or_launch_page(*args, **kwargs)      
     
