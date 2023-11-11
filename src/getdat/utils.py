@@ -31,19 +31,17 @@ class AnnasEbook:
             "class": "js-download-link"
         }
     }
+    _browser = "Continue in Browser"
     _scrape_key = "search_page_scrape"    
     _selected_result = {}
-    _msg = "for search results..."
+    _msg = "Searching Anna's Archive..."
 
     def __init__(self, q: tuple,  ext: str):
         self.q = q
         self.ext = ext
-    
-    def _source_info(self, key: str) -> str:
-        return self._source_dict.get(key)
 
     def _get_url(self, *args, **kwargs) -> str:
-        url = self._source_info("url")
+        url = self._source_dict.get("url")
         match self._scrape_key:
             case "search_page_scrape":
                 search = f'/search?q={' '.join(map(str, self.q))}'
@@ -56,8 +54,7 @@ class AnnasEbook:
                 return f"{url}{self._selected_result.get("link")}"
     
     def _get(self, *args, **kwargs):
-        source_name = self._source_info("name")
-        click.echo(f"\nSearching {source_name} {self._msg}")
+        click.echo(f"\n{self._msg}")
         click.echo("")
         try:
             response = get(self._get_url(*args, **kwargs))
@@ -69,7 +66,7 @@ class AnnasEbook:
 
     def _scrape(self, response: Response) -> dict:
         soup = BeautifulSoup(response.content, 'html.parser')
-        scrape = self._source_info(key=self._scrape_key)
+        scrape = self._source_dict.get(self._scrape_key)
         tag = scrape.get("tag")
         tag_class = scrape.get("class")
         results = dict()
@@ -94,7 +91,7 @@ class AnnasEbook:
                             "value": idx + 1
                         }
         results["0"] = {
-            "title": "Continue In Browser",
+            "title": self._browser,
             "link": response.url,
             "value": 0
         }
@@ -128,14 +125,13 @@ class AnnasEbook:
                 )
             elif self._scrape_key == "detail_page_scrape":
                 if 'Fast Partner Server' in title:
-                    click.echo(f" {key} | {title} - (Continue in Browser / Requires Member Login)")
+                    click.echo(f" {key} | {title} - ({self._browser} / Requires Member Login)")
                 elif 'Slow Partner Server' in title:
-                    click.echo(f" {key} | {title} - (Continue in Browser / Browser Verification)")
+                    click.echo(f" {key} | {title} - ({self._browser} / Browser Verification)")
                 else:
                     click.echo(f" {key} | {title}")
             else:
                 self._echo_formatted_title(key, title)
-        click.echo("")
         click.echo("")
         return have_results
     
@@ -150,6 +146,10 @@ class AnnasEbook:
             return value
     
     def _download_selected_result(self, *args, **kwargs):
+        title = self._selected_result.get("title")
+        click.echo(title)
+        if self._browser in title:
+            return open_new_tab(f"{self._source_dict.get("url")}{self._selected_result.get("link")}")
         response = self._get(*args, **kwargs)
         click.echo(response)
 
@@ -158,12 +158,13 @@ class AnnasEbook:
         if value == 0:
             return open_new_tab(self._selected_result.get("link"))
         click.echo("")
+        click.echo("")
         click.echo(click.style("Selected", fg="magenta"))
         click.echo("")
         self._echo_formatted_title(self._selected_result.get("value"), self._selected_result.get("title"))
         self._scrape_key = "detail_page_scrape"
         click.echo(click.style("==============", fg="magenta"))
-        self._msg = "for download links..."
+        self._msg = "Fetching Download Links..."
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return open_new_tab(self._selected_result.get("link"))
