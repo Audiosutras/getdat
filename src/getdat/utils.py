@@ -10,9 +10,11 @@ class AnnasEbook:
     
     _FAST_PARTNER_SERVER = 'Fast Partner Server'
     _SLOW_PARTNER_SERVER = 'Slow Partner Server'
+    _INTERNET_ARCHIVE = 'Borrow from the Internet Archive'
     _Z_LIBRARY = 'Z-Library'
     _MEMBER_LOGIN_REQUIRED = (
         _FAST_PARTNER_SERVER,
+        _INTERNET_ARCHIVE,
         _Z_LIBRARY
     )
     _HTML_CONTENT_TYPE = 'text/html'
@@ -21,7 +23,7 @@ class AnnasEbook:
     _EXPECTED_DL_CONTENT_TYPES = (
         _PDF_CONTENT_TYPE, _EPUB_CONTENT_TYPE
     )
-    _IPFS = 'ipfs'
+    _IPFS_URI = 'ipfs'
     
     _source_dict = {
         "name": "Anna's Archive",
@@ -186,7 +188,7 @@ class AnnasEbook:
                 return click.echo("download content here")
             elif (
                 content_type == self._HTML_CONTENT_TYPE and
-                self._IPFS in link 
+                self._IPFS_URI in link 
             ):
                 return click.echo(
                     click.style(
