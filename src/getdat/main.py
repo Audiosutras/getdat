@@ -1,5 +1,5 @@
 import click
-from webbrowser import open_new_tab
+import webbrowser
 from .utils import AnnasEbook
 
 @click.group(epilog='Check out our docs at https://github.com/Audiosutras/getdat for more details')
@@ -11,7 +11,7 @@ def cli():
 def cinema():
     """Launches movie-web.app in your default browser
     """
-    open_new_tab("https://movie-web.app")
+    webbrowser.open_new_tab("https://movie-web.app")
 
 @cli.command()
 @click.option(
