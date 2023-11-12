@@ -1,7 +1,7 @@
 import click
 from os import path, environ
 from requests import get
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, ChunkedEncodingError
 from requests.models import Response
 from webbrowser import open_new_tab
 from bs4 import BeautifulSoup
@@ -94,6 +94,9 @@ class AnnasEbook:
         return f"{url}{link}"
 
     def _get_url(self, *args, **kwargs) -> str:
+        link = kwargs.get("link")
+        if link:
+            return link
         source = self._determine_source()
         url = source.get("url")
         match self._scrape_key:
@@ -110,7 +113,7 @@ class AnnasEbook:
         click.echo("")
         try:
             response = get(self._get_url(*args, **kwargs))
-        except ConnectionError as e:
+        except (ConnectionError, ChunkedEncodingError) as e:
             is_download = kwargs.pop("is_download", False)
             if is_download:
                 click.echo(click.style("No connection established", fg="bright_red"))
@@ -233,7 +236,7 @@ class AnnasEbook:
         kwargs["is_download"] = True
         try:
             response = self._get(*args, **kwargs)
-        except ConnectionError:
+        except (ConnectionError, ChunkedEncodingError):
             return open_new_tab(link)
         else:
             if response.status_code != 200:
@@ -266,15 +269,35 @@ class AnnasEbook:
                 results = self._scrape_or_download(response)
                 libgen_key = list(results.keys())[0]
                 link = results.get(libgen_key).get("link")
-                click.echo(title)
+                self._msg = ""
                 if title == self._LIBGEN_LI:
                     source = self._determine_source()
                     link = f"{source.get("url")}{link}"
-                    click.echo(link)
-                    return click.echo("download content here")
+                    kwargs["link"] = link
+                    try:
+                        response = self._get(*args, **kwargs)
+                    except (ConnectionError, ChunkedEncodingError):
+                        return click.echo(
+                            click.style(
+                                f"Direct Download Not Available from {title}.\n Try Another Download Link", 
+                                fg="red"
+                            )
+                        )
+                    else:
+                        self._to_filesystem(response)
                 elif title == self._LIBGEN_RS:
-                    click.echo(link)
-                    return click.echo("download content here")
+                    kwargs["link"] = link
+                    try:
+                        response = self._get(*args, **kwargs)
+                    except (ConnectionError, ChunkedEncodingError):
+                        return click.echo(
+                            click.style(
+                                f"Direct Download Not Available from {title}.\n Try Another Download Link", 
+                                fg="red"
+                            )
+                        )
+                    else:
+                        self._to_filesystem(response)
             else: # Browser Only Options
                 open_new_tab(link)
 
