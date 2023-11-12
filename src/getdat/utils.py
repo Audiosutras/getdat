@@ -211,10 +211,11 @@ class AnnasEbook:
             self._selected_result = results.get(str(value))
             selected_link = self._selected_result.get("link")
             return value
-    
-    @staticmethod
-    def _to_filesystem(filename, response: Response):
-        with open(filename, "wb") as f:
+
+
+    def _to_filesystem(self, response: Response):
+        resource_name = self._resource_name.split(", ", 3)[-1]
+        with open(resource_name, "wb") as f:
             f.write(response.content)
 
     
@@ -230,8 +231,7 @@ class AnnasEbook:
         else:
             content_type = response.headers.get("Content-Type")
             if content_type in self._EXPECTED_DL_CONTENT_TYPES: #ipfs
-                filename = link.split("?filename=")[-1]
-                self._to_filesystem(filename, response)
+                self._to_filesystem(response)
             elif (
                 content_type == self._HTML_CONTENT_TYPE and
                 self._IPFS_URI in link 
