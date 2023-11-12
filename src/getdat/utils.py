@@ -74,6 +74,7 @@ class AnnasEbook:
     _scrape_key = "search_page_scrape"   
     _selected_result = {}
     _msg = "Searching Anna's Archive..."
+    _resource_name = ""
 
     def __init__(self, q: tuple,  ext: str):
         self.q = ' '.join(map(str, q))
@@ -211,6 +212,12 @@ class AnnasEbook:
             selected_link = self._selected_result.get("link")
             return value
     
+    @staticmethod
+    def _to_filesystem(filename, response: Response):
+        with open(filename, "wb") as f:
+            f.write(response.content)
+
+    
     def _dl_or_launch_page(self, *args, **kwargs):
         title = self._selected_result.get("title")
         link = self._determine_link()
@@ -222,9 +229,9 @@ class AnnasEbook:
             return open_new_tab(link)
         else:
             content_type = response.headers.get("Content-Type")
-            if content_type in self._EXPECTED_DL_CONTENT_TYPES:
-                click.echo(link)
-                return click.echo("download content here")
+            if content_type in self._EXPECTED_DL_CONTENT_TYPES: #ipfs
+                filename = link.split("?filename=")[-1]
+                self._to_filesystem(filename, response)
             elif (
                 content_type == self._HTML_CONTENT_TYPE and
                 self._IPFS_URI in link 
@@ -237,7 +244,7 @@ class AnnasEbook:
                 )
             elif ( 
                 any(libgen in title for libgen in self._LIBGEN_EXTERNAL)
-            ):
+            ): #libgen 
                 for libgen in self._LIBGEN_EXTERNAL:
                         if libgen in title:
                             self._current_source = libgen
@@ -262,6 +269,7 @@ class AnnasEbook:
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return open_new_tab(self._selected_result.get("link"))
+        self._resource_name = self._selected_result.get("title")
         click.echo("")
         click.echo("")
         click.echo(click.style("Selected", fg="bright_cyan"))
