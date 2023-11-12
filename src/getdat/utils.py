@@ -146,12 +146,13 @@ class AnnasEbook:
             case "download_page":
                 for idx, el in enumerate(soup.find_all(tag)):
                     # libgen pages
-                            if el.string == "GET":
-                                results[str(idx + 1)] = {
-                                    "title": el.string,
-                                    "link": el["href"],
-                                    "value": idx + 1
-                                }
+                    if el.string == "GET":
+                        # should only be 1 entry
+                        results[str(idx + 1)] = {
+                            "title": el.string,
+                            "link": el["href"],
+                            "value": idx + 1
+                        }
         results["0"] = {
             "title": self._browser,
             "link": response.url,
@@ -222,6 +223,7 @@ class AnnasEbook:
         else:
             content_type = response.headers.get("Content-Type")
             if content_type in self._EXPECTED_DL_CONTENT_TYPES:
+                click.echo(link)
                 return click.echo("download content here")
             elif (
                 content_type == self._HTML_CONTENT_TYPE and
@@ -236,13 +238,22 @@ class AnnasEbook:
             elif ( 
                 any(libgen in title for libgen in self._LIBGEN_EXTERNAL)
             ):
-                click.echo("here")
                 for libgen in self._LIBGEN_EXTERNAL:
                         if libgen in title:
                             self._current_source = libgen
                 self._scrape_key = "download_page" 
                 results = self._scrape_or_download(response)
-                click.echo(results) 
+                libgen_key = list(results.keys())[0]
+                link = results.get(libgen_key).get("link")
+                click.echo(title)
+                if title == self._LIBGEN_LI:
+                    source = self._determine_source()
+                    link = f"{source.get("url")}/{link}"
+                    click.echo(link)
+                    return click.echo("download content here")
+                elif title == self._LIBGEN_RS:
+                    click.echo(link)
+                    return click.echo("download content here")
             else: # Browser Only Options
                 open_new_tab(link)
 
