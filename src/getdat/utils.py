@@ -12,6 +12,12 @@ class AnnasEbook:
     _SLOW_PARTNER_SERVER = 'Slow Partner Server'
     _INTERNET_ARCHIVE = 'Borrow from the Internet Archive'
     _Z_LIBRARY = 'Z-Library'
+    _LIBGEN_RS = 'Libgen.rs Non-Fiction'
+    _LIBGEN_LI = 'Libgen.li'
+    _LIBGEN_EXTERNAL = (
+        _LIBGEN_RS,
+        _LIBGEN_LI,
+    )
     _MEMBER_LOGIN_REQUIRED = (
         _FAST_PARTNER_SERVER,
         _INTERNET_ARCHIVE,
@@ -24,32 +30,37 @@ class AnnasEbook:
         _PDF_CONTENT_TYPE, _EPUB_CONTENT_TYPE
     )
     _IPFS_URI = 'ipfs'
+
+    _SOURCE_ANNAS = "Anna's Archive"
     
-    _source_dict = {
-        "name": "Anna's Archive",
-        "url": "https://annas-archive.org",
-        "search_page_scrape": {
-            "tag": "a",
-            "class": (
-                "js-vim-focus custom-a flex items-center "
-                "relative left-[-10px] w-[calc(100%+20px)] px-[10px] "
-                "outline-offset-[-2px] outline-2 rounded-[3px] hover:bg-[#00000011] "
-                "focus:outline"
-            ),
-            "title_container": {
-                "tag": "div",
+    _SOURCE_DICT = {
+        _SOURCE_ANNAS: {
+            "name": _SOURCE_ANNAS,
+            "url": "https://annas-archive.org",
+            "search_page_scrape": {
+                "tag": "a",
                 "class": (
-                    "line-clamp-[2] leading-[1.2] text-[10px] lg:text-xs text-gray-500"
-                )
+                    "js-vim-focus custom-a flex items-center "
+                    "relative left-[-10px] w-[calc(100%+20px)] px-[10px] "
+                    "outline-offset-[-2px] outline-2 rounded-[3px] hover:bg-[#00000011] "
+                    "focus:outline"
+                ),
+                "title_container": {
+                    "tag": "div",
+                    "class": (
+                        "line-clamp-[2] leading-[1.2] text-[10px] lg:text-xs text-gray-500"
+                    )
+                }
+            },
+            "detail_page_scrape": {
+                "tag": "a",
+                "class": "js-download-link"
             }
-        },
-        "detail_page_scrape": {
-            "tag": "a",
-            "class": "js-download-link"
         }
     }
+    _current_source = _SOURCE_ANNAS 
     _browser = "Continue in Browser"
-    _scrape_key = "search_page_scrape"    
+    _scrape_key = "search_page_scrape"   
     _selected_result = {}
     _msg = "Searching Anna's Archive..."
 
@@ -57,15 +68,20 @@ class AnnasEbook:
         self.q = ' '.join(map(str, q))
         self.ext = ext
     
+    def _determine_source(self) -> dict:
+        return self._SOURCE_DICT.get(self._current_source)
+
     def _determine_link(self) -> str:
-        url = self._source_dict.get("url")
+        source = self._determine_source()
+        url = source.get("url")
         link = self._selected_result.get("link")
         if any(protocal in self._selected_result.get("link") for protocal in ['https://', 'http://']):
             return link
         return f"{url}{link}"
 
     def _get_url(self, *args, **kwargs) -> str:
-        url = self._source_dict.get("url")
+        source = self._determine_source()
+        url = source.get("url")
         match self._scrape_key:
             case "search_page_scrape":
                 search = f'/search?q={self.q}'
@@ -81,7 +97,7 @@ class AnnasEbook:
         try:
             response = get(self._get_url(*args, **kwargs))
         except ConnectionError as e:
-            is_download = kwargs.get("is_download", False)
+            is_download = kwargs.pop("is_download", False)
             if is_download:
                 click.echo(click.style("No connection established", fg="bright_red"))
                 raise e
@@ -91,7 +107,8 @@ class AnnasEbook:
 
     def _scrape_or_download(self, response: Response) -> dict:
         soup = BeautifulSoup(response.content, 'html.parser')
-        scrape = self._source_dict.get(self._scrape_key, {})
+        source = self._determine_source()
+        scrape = source.get(self._scrape_key, {})
         tag = scrape.get("tag", "")
         tag_class = scrape.get("class", "")
         results = dict()
@@ -115,13 +132,15 @@ class AnnasEbook:
                             "link": el["href"],
                             "value": idx + 1
                         }
+            case "download_page":
+                pass
         results["0"] = {
             "title": self._browser,
             "link": response.url,
             "value": 0
         }
         return results
-    
+
     @staticmethod
     def _echo_formatted_title(key, title_str):
             title_list = title_str.split(", ", 3)
@@ -195,7 +214,13 @@ class AnnasEbook:
                         f"Direct Download Not Available from {title}.\n Try Another Download Link", 
                         fg="red"
                     )
-                ) 
+                )
+            elif (
+                content_type == self._HTML_CONTENT_TYPE and 
+                any(libgen in title for libgen in self._LIBGEN_EXTERNAL)
+            ):
+                self._scrape_key = "download_page"
+                results = self._scrape_or_download(response) 
             else: # Browser Only Options
                 open_new_tab(link)
 
