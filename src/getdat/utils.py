@@ -56,6 +56,17 @@ class AnnasEbook:
                 "tag": "a",
                 "class": "js-download-link"
             }
+        },
+        _LIBGEN_RS: {
+            "download_page": {
+                "tag": "a"
+            }
+        },
+        _LIBGEN_LI: {
+            "url": "https://libgen.li",
+            "download_page": {
+                "tag": "a"
+            }
         }
     }
     _current_source = _SOURCE_ANNAS 
@@ -133,7 +144,14 @@ class AnnasEbook:
                             "value": idx + 1
                         }
             case "download_page":
-                pass
+                for idx, el in enumerate(soup.find_all(tag)):
+                    # libgen pages
+                            if el.string == "GET":
+                                results[str(idx + 1)] = {
+                                    "title": el.string,
+                                    "link": el["href"],
+                                    "value": idx + 1
+                                }
         results["0"] = {
             "title": self._browser,
             "link": response.url,
@@ -215,12 +233,16 @@ class AnnasEbook:
                         fg="red"
                     )
                 )
-            elif (
-                content_type == self._HTML_CONTENT_TYPE and 
+            elif ( 
                 any(libgen in title for libgen in self._LIBGEN_EXTERNAL)
             ):
-                self._scrape_key = "download_page"
-                results = self._scrape_or_download(response) 
+                click.echo("here")
+                for libgen in self._LIBGEN_EXTERNAL:
+                        if libgen in title:
+                            self._current_source = libgen
+                self._scrape_key = "download_page" 
+                results = self._scrape_or_download(response)
+                click.echo(results) 
             else: # Browser Only Options
                 open_new_tab(link)
 
@@ -239,7 +261,7 @@ class AnnasEbook:
         self._msg = "Fetching Download Links..."
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
-            return open_new_tab(self._selected_result.get("link")) 
+            return open_new_tab(self._selected_result.get("link"))
         self._scrape_key = ""
         self._dl_or_launch_page(*args, **kwargs)      
     
