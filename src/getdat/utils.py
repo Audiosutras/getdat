@@ -6,6 +6,12 @@ from requests.models import Response
 from webbrowser import open_new_tab
 from bs4 import BeautifulSoup
 
+def print_help(msg: str):
+    click.echo(click.style(msg, fg="red"))
+    click.echo("")
+    ctx = click.get_current_context()
+    click.echo(ctx.get_help())
+    ctx.exit()
 
 class AnnasEbook:
     

@@ -1,6 +1,6 @@
 import click
 import webbrowser
-from .utils import AnnasEbook
+from .utils import AnnasEbook, print_help
 
 @click.group(epilog='Check out our docs at https://github.com/Audiosutras/getdat for more details')
 def cli():
@@ -34,6 +34,8 @@ def cinema():
 @click.argument('q', nargs=-1)
 def ebook(q, ext, output_dir):
     """Search for a particular ebook using Anna's Archive"""
+    if not q:
+        print_help("Please provide your search to continue.")
     ebook = AnnasEbook(q=q, ext=ext, output_dir=output_dir)
     ebook.run()
 
