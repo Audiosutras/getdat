@@ -15,6 +15,16 @@ def cinema():
 
 @cli.command()
 @click.option(
+    '-o',
+    '--output_dir',
+    help=(
+        "Path to ebook's output directory from home directory. "
+        "Path must be prefixed by '~' on Unix or '~user' on Windows. "
+        "This argument overrides GETDAT_BOOK_DIR env var if set. "
+        "Outputs book to working directory if neither are set."
+    )
+)
+@click.option(
     '-e',
     '--ext',
     type=click.Choice(['epub', 'pdf']),
@@ -22,8 +32,8 @@ def cinema():
     help="Preferred Ebook extension"
 )
 @click.argument('q', nargs=-1)
-def ebook(q, ext):
+def ebook(q, ext, output_dir):
     """Search for a particular ebook using Anna's Archive"""
-    ebook = AnnasEbook(q=q, ext=ext)
+    ebook = AnnasEbook(q=q, ext=ext, output_dir=output_dir)
     ebook.run()
 

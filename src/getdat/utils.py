@@ -1,4 +1,5 @@
 import click
+from os import path, environ
 from requests import get
 from requests.exceptions import ConnectionError
 from requests.models import Response
@@ -76,8 +77,9 @@ class AnnasEbook:
     _msg = "Searching Anna's Archive..."
     _resource_name = ""
 
-    def __init__(self, q: tuple,  ext: str):
+    def __init__(self, q: tuple,  ext: str, output_dir: str):
         self.q = ' '.join(map(str, q))
+        self.output_dir = output_dir or environ.get('GETDAT_BOOK_DIR')  
         self.ext = ext
     
     def _determine_source(self) -> dict:
@@ -215,8 +217,13 @@ class AnnasEbook:
 
     def _to_filesystem(self, response: Response):
         resource_name = self._resource_name.split(", ", 3)[-1]
-        with open(resource_name, "wb") as f:
-            f.write(response.content)
+        if self.output_dir:
+            resource_path = path.join(path.expanduser(self.output_dir), resource_name)
+            with open(resource_path, "wb") as f:
+                f.write(response.content)
+        else:
+            with open(resource_name, "wb") as f:
+                f.write(response.content)
 
     
     def _dl_or_launch_page(self, *args, **kwargs):
@@ -229,6 +236,13 @@ class AnnasEbook:
         except ConnectionError:
             return open_new_tab(link)
         else:
+            if response.status_code != 200:
+                return click.echo(
+                    click.style(
+                        f"Direct Download Not Available from {title}.\n Try Another Download Link", 
+                        fg="red"
+                    )
+                )
             content_type = response.headers.get("Content-Type")
             if content_type in self._EXPECTED_DL_CONTENT_TYPES: #ipfs
                 self._to_filesystem(response)
