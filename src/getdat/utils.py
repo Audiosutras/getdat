@@ -63,7 +63,7 @@ class AnnasEbook:
             }
         },
         _LIBGEN_LI: {
-            "url": "https://libgen.li",
+            "url": "https://libgen.li/",
             "download_page": {
                 "tag": "a"
             }
@@ -248,7 +248,7 @@ class AnnasEbook:
                 click.echo(title)
                 if title == self._LIBGEN_LI:
                     source = self._determine_source()
-                    link = f"{source.get("url")}/{link}"
+                    link = f"{source.get("url")}{link}"
                     click.echo(link)
                     return click.echo("download content here")
                 elif title == self._LIBGEN_RS:
