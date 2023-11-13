@@ -119,4 +119,29 @@ class TestAnnasEbook:
         )
         assert ebook._determine_source() == expected_dict
     
+    @pytest.mark.parametrize(
+        "selected_result, expected_link",
+        [
+            ({"link": "https://books.google.com"}, "https://books.google.com"),
+            ({"link": "http://shady-books.google.com"}, "http://shady-books.google.com"),
+            (
+                {"link": "/md5/234890238402380423"}, 
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/md5/234890238402380423"
+            )
+        ]
+    )
+    def test_determine_link(self, selected_result, expected_link, mocker):
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocker.patch.object(
+            ebook, 
+            '_current_source', 
+            AnnasEbook._current_source # _SOURCE_ANNAS
+        )
+        mocker.patch.object(
+            ebook, 
+            '_selected_result', 
+            selected_result
+        )
+        assert ebook._determine_link() == expected_link
+
 
