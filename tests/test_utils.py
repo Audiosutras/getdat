@@ -1,8 +1,9 @@
 import os
 import click
 import pytest
+import requests
 from click.testing import CliRunner
-
+from requests.exceptions import ConnectionError, ChunkedEncodingError
 from src.getdat.utils import print_help, AnnasEbook
 
 class TestPrintHelp:
@@ -282,4 +283,56 @@ class TestAnnasEbook:
             _scrape_key
         )
         kwargs = {"link": link}
-        assert ebook._get_url(**kwargs) == expected_url 
+        assert ebook._get_url(**kwargs) == expected_url
+
+        @pytest.mark.parametrize(
+            "msg, error, error_msg, is_download",
+            [
+                (
+                    "This is a message echoed to user",
+                    None,
+                    "",
+                    False
+                ),
+                (
+                    "",
+                    None,
+                    "",
+                    False
+                ),
+                (
+                    "This is a message echoed to user",
+                    ConnectionError,
+                    "No connection established",
+                    False
+                ),
+                (
+                    "",
+                    ChunkedEncodingError,
+                    "No connection established",
+                    False
+                ),
+                (
+                    "",
+                    ConnectionError,
+                    "No connection established",
+                    True
+                ),
+                (
+                    "This is a message echoed to user",
+                    ChunkedEncodingError,
+                    "No connection established",
+                    True
+                )
+            ]
+        )
+        def test__get(self, msg, error, error_msg, is_download, mocker):
+            ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+            mocked_get = mocker.patch.object(requests, 'get')
+            if error:
+                mocked_get.side_effect = error
+            else:
+                mocked_get.return_value = "OK"
+                # No error occured and returns response
+                assert ebook._get() ==  "OK"
+
