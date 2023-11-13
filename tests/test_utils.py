@@ -37,6 +37,8 @@ class TestAnnasEbook:
     }
 
     q = "Treasure Island Stevenson"
+    ext = "epub"
+    output_dir = "~/books/epub"
 
     @pytest.mark.parametrize("test_q_args,expected_q", [
         (("Treasure Island Stevenson",), "Treasure Island Stevenson"), 
@@ -53,10 +55,22 @@ class TestAnnasEbook:
         assert ebook.output_dir is None
         # GETDAT_BOOK_DIR loaded into environment
         mocker.patch.dict('os.environ', self.env, clear=True)
-        option_output_dir = "~/books/epub"
-        ebook_1 = AnnasEbook(q=self.q, ext="epub", output_dir=option_output_dir)
+        ebook_1 = AnnasEbook(q=self.q, ext="epub", output_dir=self.output_dir)
         # option_output_dir overrides GETDAT_BOOK_DIR
-        assert ebook_1.output_dir == option_output_dir
+        assert ebook_1.output_dir == self.output_dir
         # GETDAT_BOOK_DIR determines output_dir
         ebook_2 = AnnasEbook(q=self.q, ext="epub", output_dir="")
         assert ebook_2.output_dir == self.env.get("GETDAT_BOOK_DIR")
+    
+    @pytest.mark.parametrize(
+        "ext,expected_ext",
+        [("epub", "epub"), ("pdf", "pdf"), ("", "")]
+    )
+    def test_ext(self, ext, expected_ext):
+        ebook = AnnasEbook(q=self.q, ext=ext, output_dir=self.output_dir)
+        ebook.ext = expected_ext
+    
+    # def test_determine_source(self):
+
+    
+
