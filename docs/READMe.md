@@ -42,7 +42,7 @@ Launches [movie-web.app](https://movie-web.app/search/movie) in your default bro
 ```
 
 ## Ebook 
-Search and download an ebook available through [Anna's Archive](https://annas-archive.org/). You think of this command as "headless" Anna's Archive
+Search and download an ebook available through [Anna's Archive](https://annas-archive.org/). You can think of this command as "headless" Anna's Archive
 
 <div align="center">
     <img
