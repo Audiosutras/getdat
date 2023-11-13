@@ -30,17 +30,19 @@ class TestPrintHelp:
         ctx.assert_called_once()
 
 
+SEARCH = "Treasure Island Stevenson"
+
 class TestAnnasEbook:
 
     env = {
         "GETDAT_BOOK_DIR": "~/books"
     }
 
-    q = "Treasure Island Stevenson"
+    q = (SEARCH,)
     ext = "epub"
     output_dir = "~/books/epub"
 
-    @pytest.mark.parametrize("test_q_args,expected_q", [
+    @pytest.mark.parametrize("test_q_args, expected_q", [
         (("Treasure Island Stevenson",), "Treasure Island Stevenson"), 
         (("Treasure", "Island", "Stevenson",), "Treasure Island Stevenson")
     ])
@@ -63,7 +65,7 @@ class TestAnnasEbook:
         assert ebook_2.output_dir == self.env.get("GETDAT_BOOK_DIR")
     
     @pytest.mark.parametrize(
-        "ext,expected_ext",
+        "ext, expected_ext",
         [("epub", "epub"), ("pdf", "pdf"), ("", "")]
     )
     def test_ext(self, ext, expected_ext):
@@ -71,7 +73,7 @@ class TestAnnasEbook:
         ebook.ext = expected_ext
     
     @pytest.mark.parametrize(
-        "source,expected_dict",
+        "source, expected_dict",
         [
             (AnnasEbook._SOURCE_ANNAS, {
                 "name": AnnasEbook._SOURCE_ANNAS,
@@ -130,7 +132,7 @@ class TestAnnasEbook:
             )
         ]
     )
-    def test_determine_link(self, selected_result, expected_link, mocker):
+    def test__determine_link(self, selected_result, expected_link, mocker):
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
         mocker.patch.object(
             ebook, 
@@ -143,5 +145,141 @@ class TestAnnasEbook:
             selected_result
         )
         assert ebook._determine_link() == expected_link
-
-
+    
+    @pytest.mark.parametrize(
+        "ext, link, _current_source, _selected_result, _scrape_key, expected_url",
+        [
+            (
+                "epub",
+                None, 
+                AnnasEbook._SOURCE_ANNAS, 
+                {},
+                "search_page_scrape",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/search?q={SEARCH}&ext=epub",
+            ),
+            (
+                "pdf",
+                None, 
+                AnnasEbook._SOURCE_ANNAS, 
+                {},
+                "search_page_scrape",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/search?q={SEARCH}&ext=pdf",
+            ),
+            (
+                "",
+                None, 
+                AnnasEbook._SOURCE_ANNAS, 
+                {},
+                "search_page_scrape",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/search?q={SEARCH}",
+            ),
+            (
+                "pdf",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {"link": "https://books.google.com"},
+                None,
+                "https://books.google.com"
+            ),
+            (
+                "",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {"link": "https://books.google.com"},
+                "download_page",
+                "https://books.google.com"
+            ),
+            (
+                "epub",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {"link": "https://books.google.com"},
+                "another_random_scrape_key",
+                "https://books.google.com"
+            ),
+            (
+                "",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {"link": "http://shady-books.google.com"},
+                None,
+                "http://shady-books.google.com"
+            ),
+            (
+                "pdf",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {"link": "http://shady-books.google.com"},
+                None,
+                "http://shady-books.google.com"
+            ),
+            (
+                "",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {"link": "/md5/234890238402380423"},
+                None,
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/md5/234890238402380423"
+            ),
+            (
+                "epub",
+                "https://solid-books.google.com",
+                AnnasEbook._LIBGEN_LI,
+                {"link": "/md5/234890238402380423"},
+                None,
+                "https://solid-books.google.com"
+            ),
+            (
+                "epub",
+                None,
+                AnnasEbook._LIBGEN_LI,
+                {"link": "/md5/234890238402380423"},
+                None,
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._LIBGEN_LI].get("url")}/md5/234890238402380423"
+            ),
+            (
+                "",
+                "http://big-solid-books.google.com/?md5=32480238402384023",
+                AnnasEbook._LIBGEN_RS,
+                {},
+                "download_page",
+                "http://big-solid-books.google.com/?md5=32480238402384023"
+            ),
+            (
+                "",
+                "http://big-solid-books.google.com/?md5=32480238402384023",
+                AnnasEbook._LIBGEN_RS,
+                {"link": "/md5/234890238402380423"},
+                "",
+                "http://big-solid-books.google.com/?md5=32480238402384023"
+            )
+        ]
+    )
+    def test__get_url(
+        self,
+        ext,
+        link, 
+        _current_source, 
+        _selected_result, 
+        _scrape_key, 
+        expected_url,
+        mocker
+    ):
+        ebook = AnnasEbook(q=self.q, ext=ext, output_dir=self.output_dir)
+        mocker.patch.object(
+            ebook,
+            '_current_source',
+            _current_source
+        )
+        mocker.patch.object(
+            ebook,
+            '_selected_result',
+            _selected_result
+        )
+        mocker.patch.object(
+            ebook,
+            '_scrape_key',
+            _scrape_key
+        )
+        kwargs = {"link": link}
+        assert ebook._get_url(**kwargs) == expected_url 

@@ -63,7 +63,7 @@ class TestEbook:
     def test_1_search_arg_ebook_run(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, 'run')
         self.runner.invoke(
-            ebook, "Commentary on the Explanation of the Beautiful Names of Allah"
+            ebook, "Treasure Island Stevenson"
         )
         ebook_run_method.assert_called_once()
     
@@ -71,16 +71,9 @@ class TestEbook:
         ebook_run_method = mocker.patch.object(AnnasEbook, 'run')
         self.runner.invoke(
             ebook, [
-                "Commentary",
-                "on",
-                "the",
-                "Explanation",
-                "of",
-                "the",
-                "Beautiful",
-                "Names",
-                "of",
-                "Allah"
+                "Treasure",
+                "Island",
+                "Stevenson"
             ]
         )
         ebook_run_method.assert_called_once()
@@ -89,7 +82,7 @@ class TestEbook:
         ebook_run_method = mocker.patch.object(AnnasEbook, 'run')
         self.runner.invoke(
             ebook, 
-            "Commentary on the Explanation of the Beautiful Names of Allah --ext=epub"
+            "Treasure Island Stevenson --ext=epub"
         )
         ebook_run_method.assert_called_once()
 
@@ -97,7 +90,7 @@ class TestEbook:
         ebook_run_method = mocker.patch.object(AnnasEbook, 'run')
         self.runner.invoke(
             ebook, 
-            "Commentary on the Explanation of the Beautiful Names of Allah --output_dir=~/books/"
+            "Treasure Island Stevenson --output_dir=~/books/"
         )
         ebook_run_method.assert_called_once()
 
@@ -105,6 +98,6 @@ class TestEbook:
         ebook_run_method = mocker.patch.object(AnnasEbook, 'run')
         self.runner.invoke(
             ebook, 
-            "Commentary on the Explanation of the Beautiful Names of Allah --ext=epub --output_dir=~/books/"
+            "Treasure Island Stevenson --ext=epub --output_dir=~/books/"
         )
         ebook_run_method.assert_called_once()
