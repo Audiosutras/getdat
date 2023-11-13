@@ -30,7 +30,7 @@ def cinema():
     '--ext',
     type=click.Choice(['epub', 'pdf']),
     default="epub",
-    help="Preferred Ebook extension"
+    help="Preferred ebook extension for search results"
 )
 @click.argument('q', nargs=-1)
 def ebook(q, ext, output_dir):

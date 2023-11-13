@@ -41,19 +41,47 @@ Launches [movie-web.app](https://movie-web.app/search/movie) in your default bro
 -> getdat cinema
 ```
 
-## Ebook
-Search and download an ebook available through Anna's Archive
+## Ebook 
+Search and download an ebook available through [Anna's Archive](https://annas-archive.org/). You think of this command as "headless" Anna's Archive
 
 <div align="center">
     <img
         src="/docs/static/getdat-ebook.gif"
-        alt="Gif of GetDat Cinema Command In Action"
+        alt="Gif of GetDat Cinema Command In Action"   
     />
 </div>
 
-```bash
--> getdat ebook <Search>
-```
-* Tests are a work in progress for this command
 * The demo for this command downloaded an epub format of Robert Louis Stevenson's and N.C. Wyeth's book *Treasure Island*. This book is in the public domain.
-* The demo opens the downloaded epub  
+* The demo for this command opens the downloaded ebook using [epr](https://github.com/wustho/epr), a terminal epub reader to show the contents of the downloaded book. You can expect higher ebook quality by using a desktop e-reader like [librum](https://librumreader.com/)
+* Anna's Archive `SciDB` search is not yest supported.
+
+
+```bash
+-> getdat ebook [OPTIONS] [Q]
+```
+
+#### ARGUMENTS
+
+| Name | Help | 
+|------|------|
+| Q    | Search |
+
+Example:
+```bash
+-> getdat ebook "Treasure Island Stevenson"
+```
+or
+```bash
+-> getdat ebook Treasure Island Stevenson
+```
+
+#### OPTIONS
+
+| Name | Convention 1 | Convention 2 | Type | Help |
+| ---- | ------------ | ------------ | ----| ----|
+| Output Directory | -o | --output_dir | Text | Path to ebook's output directory from home directory. Path must be prefixed by `~` on Unix or `~user` on Windows. This argument overrides `GETDAT_BOOK_DIR` env var if set. Outputs book to working directory if neither are set.
+| Extension | -e | --ext | [epub | pdf] | Preferred ebook extension for search results 
+
+
+#### Notes
+* Tests are a work in progress for this command
