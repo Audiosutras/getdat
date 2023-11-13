@@ -70,7 +70,53 @@ class TestAnnasEbook:
         ebook = AnnasEbook(q=self.q, ext=ext, output_dir=self.output_dir)
         ebook.ext = expected_ext
     
-    # def test_determine_source(self):
-
+    @pytest.mark.parametrize(
+        "source,expected_dict",
+        [
+            (AnnasEbook._SOURCE_ANNAS, {
+                "name": AnnasEbook._SOURCE_ANNAS,
+                "url": "https://annas-archive.org",
+                "search_page_scrape": {
+                    "tag": "a",
+                    "class": (
+                        "js-vim-focus custom-a flex items-center "
+                        "relative left-[-10px] w-[calc(100%+20px)] px-[10px] "
+                        "outline-offset-[-2px] outline-2 rounded-[3px] hover:bg-[#00000011] "
+                        "focus:outline"
+                    ),
+                    "title_container": {
+                        "tag": "div",
+                        "class": (
+                            "line-clamp-[2] leading-[1.2] text-[10px] lg:text-xs text-gray-500"
+                        )
+                    }
+                },
+                "detail_page_scrape": {
+                    "tag": "a",
+                    "class": "js-download-link"
+                }
+            }),
+            (AnnasEbook._LIBGEN_RS, {
+                "download_page": {
+                    "tag": "a"
+                }
+            }),
+            (AnnasEbook._LIBGEN_LI, {
+                "url": "https://libgen.li/",
+                "download_page": {
+                    "tag": "a"
+                }
+            }),
+            ("Not part of _SOURCE_DICT", None)
+        ]
+    )
+    def test_determine_source(self, source, expected_dict, mocker):
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocker.patch.object(
+            ebook, 
+            '_current_source', 
+            source
+        )
+        assert ebook._determine_source() == expected_dict
     
 
