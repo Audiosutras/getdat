@@ -22,7 +22,7 @@ class TestPrintHelp:
         ctx = mocker.patch.object(click, "get_current_context", return_value=mock_get_current_context)
         print_help(msg)
         # assert our message is styled with error styling (red).
-        # wrapped in click.echo so it will be shown
+        # Its wrapped in click.echo so it will be shown
         spy.assert_called_once_with(msg, fg="red")
         # asserts that the context manager is fetched
         # to show help text for a command
