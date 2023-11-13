@@ -1,3 +1,4 @@
+import os
 import click
 import pytest
 from click.testing import CliRunner
@@ -27,3 +28,35 @@ class TestPrintHelp:
         # asserts that the context manager is fetched
         # to show help text for a command
         ctx.assert_called_once()
+
+
+class TestAnnasEbook:
+
+    env = {
+        "GETDAT_BOOK_DIR": "~/books"
+    }
+
+    q = "Treasure Island Stevenson"
+
+    @pytest.mark.parametrize("test_q_args,expected_q", [
+        (("Treasure Island Stevenson",), "Treasure Island Stevenson"), 
+        (("Treasure", "Island", "Stevenson",), "Treasure Island Stevenson")
+    ])
+    def test_q_1_arg_and_many_args(self, test_q_args, expected_q):
+        ebook = AnnasEbook(q=test_q_args, ext='pdf', output_dir="")
+        assert ebook.q == expected_q
+    
+    def test_output_dir(self, mocker):
+        patched_env = mocker.patch.dict('os.environ', clear=True)
+        # Neither option_output_dir or GETDAT_BOOK_DIR is set
+        ebook = AnnasEbook(q=self.q, ext="epub", output_dir="")
+        assert ebook.output_dir is None
+        # GETDAT_BOOK_DIR loaded into environment
+        mocker.patch.dict('os.environ', self.env, clear=True)
+        option_output_dir = "~/books/epub"
+        ebook_1 = AnnasEbook(q=self.q, ext="epub", output_dir=option_output_dir)
+        # option_output_dir overrides GETDAT_BOOK_DIR
+        assert ebook_1.output_dir == option_output_dir
+        # GETDAT_BOOK_DIR determines output_dir
+        ebook_2 = AnnasEbook(q=self.q, ext="epub", output_dir="")
+        assert ebook_2.output_dir == self.env.get("GETDAT_BOOK_DIR")
