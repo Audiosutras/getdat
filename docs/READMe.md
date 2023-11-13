@@ -2,7 +2,7 @@
     <h1>GetDat</h1>
     <p><i>A command line utility for getting resources available online</i></p>
     <img
-        src="/docs/static/getdat-logo.png"
+        src="docs/static/getdat-logo.png"
         width="250" 
         height="250" 
         alt="GetDat Package Logo"
