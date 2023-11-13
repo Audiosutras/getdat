@@ -128,7 +128,7 @@ class AnnasEbook:
         else:
             return response
 
-    def _scrape_or_download(self, response: Response) -> dict:
+    def _scrape_results(self, response: Response) -> dict:
         soup = BeautifulSoup(response.content, 'html.parser')
         source = self._determine_source()
         scrape = source.get(self._scrape_key, {})
@@ -215,7 +215,7 @@ class AnnasEbook:
     
     def _scrape_page(self, *args, **kwargs) -> int:
         response = self._get(*args, **kwargs)
-        results = self._scrape_or_download(response)
+        results = self._scrape_results(response)
         have_results = self._echo_results(results)
         if have_results:
             value = click.prompt("Select Number", type=click.IntRange(min=0, max=(len(results) - 1)))
@@ -272,7 +272,7 @@ class AnnasEbook:
                         if libgen in title:
                             self._current_source = libgen
                 self._scrape_key = "download_page" 
-                results = self._scrape_or_download(response)
+                results = self._scrape_results(response)
                 libgen_key = list(results.keys())[0]
                 link = results.get(libgen_key).get("link")
                 self._msg = ""

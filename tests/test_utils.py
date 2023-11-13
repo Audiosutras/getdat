@@ -363,4 +363,58 @@ class TestAnnasEbook:
             spy.assert_called_once_with(f"\n{msg}", fg="bright_yellow")
             # No error occured and returns response
             assert response ==  "OK"
+    
+    @pytest.mark.parametrize(
+        "_current_source, _scrape_key, html_file_path, expected_results",
+        [
+            (
+                AnnasEbook._SOURCE_ANNAS,
+                "search_page_scrape",
+                "tests/static/annas_archive_search.html",
+                {
+                    '1': {'title': 'English [en], mobi, 0.6MB, Treasure Island - Stevenson, Robert Louis.mobi', 'link': '/md5/3ee7cf06b2c2b6aeea846894c4d79ea2', 'value': 1}, 
+                    '2': {'title': 'English [en], azw, 0.3MB, Treasure Island - Stevenson, Robert Louis.azw', 'link': '/md5/24546a458458c5ea0e9bea31da25faaa', 'value': 2}, 
+                    '3': {'title': 'English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub', 'link': '/md5/4f95158d79dae74e16b5d0567be36fa6', 'value': 3}, 
+                    '4': {'title': 'English [en], epub, 3.2MB', 'link': '/md5/e307fa56fab0f201c46fed5a1389a272', 'value': 4}, 
+                    '5': {'title': 'English [en], pdf, 14.6MB, treasureisland0000stev_f7z0.pdf', 'link': '/md5/e5f954e12ce182fd530f7c16429a2134', 'value': 5}, 
+                    '6': {'title': 'English [en], pdf, 0.9MB, stevenson-treasureisland.pdf', 'link': '/md5/6a861b94014c6adb183efe365c2fda18', 'value': 6}, 
+                    '7': {'title': 'English [en], pdf, 1.0MB, Stevenson, Robert Louis - Treasure Island.pdf', 'link': '/md5/1b330f48bec2f9243c4be43a3089072a', 'value': 7}, 
+                    '8': {'title': 'English [en], pdf, 0.9MB, Stevenson, Robert Louis - Treasure Island (2013, ).pdf', 'link': '/md5/28218ee8acf73a14dfef83936adc1502', 'value': 8}, 
+                    '9': {'title': 'English [en], epub, 3.2MB, Treasure Island - Robert Louis Stevenson_1340.epub', 'link': '/md5/53a0b994062dc73b106144fdcbb8541d', 'value': 9}, 
+                    '10': {'title': 'English [en], epub, 0.3MB, Stevenson, Robert Louis - Treasure Island (2012, ).epub', 'link': '/md5/abdb6dfe663b5fb4181123ea3973a38e', 'value': 10}, 
+                    '11': {'title': 'English [en], epub, 0.3MB, [english] Stevenson, Robert Louis - Treasure Island.epub', 'link': '/md5/eabed0af49b234fa21c6029248816f25', 'value': 11}, 
+                    '0': {'title': 'Continue in Browser', 'link': 'https://url.that-is-launched-in-browser.com', 'value': 0}
+                }
+
+
+            )
+        ]
+    )
+    def test__scrape_results(self, _current_source, _scrape_key, html_file_path, expected_results, mocker):
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocker.patch.object(
+            ebook,
+            '_current_source',
+            _current_source
+        )
+        mocker.patch.object(
+            ebook,
+            '_scrape_key',
+            _scrape_key
+        )
+        class MockResponse:
+
+            @property
+            def url(self):
+                return "https://url.that-is-launched-in-browser.com"
+
+            @property
+            def content(self):
+                with open(html_file_path) as f:
+                    return f.read()
+        
+        response = MockResponse()
+        results = ebook._scrape_results(response=response)
+        assert results == expected_results
+
 
