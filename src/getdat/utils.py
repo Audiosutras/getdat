@@ -1,6 +1,6 @@
 import click
 from os import path, environ
-from requests import get
+import requests
 from requests.exceptions import ConnectionError, ChunkedEncodingError
 from requests.models import Response
 from webbrowser import open_new_tab
@@ -118,7 +118,7 @@ class AnnasEbook:
         click.echo(click.style(f"\n{self._msg}", fg="bright_yellow"))
         click.echo("")
         try:
-            response = get(self._get_url(*args, **kwargs))
+            response = requests.get(self._get_url(*args, **kwargs))
         except (ConnectionError, ChunkedEncodingError) as e:
             is_download = kwargs.pop("is_download", False)
             if is_download:

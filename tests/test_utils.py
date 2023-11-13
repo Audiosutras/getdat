@@ -285,54 +285,82 @@ class TestAnnasEbook:
         kwargs = {"link": link}
         assert ebook._get_url(**kwargs) == expected_url
 
-        @pytest.mark.parametrize(
-            "msg, error, error_msg, is_download",
-            [
-                (
-                    "This is a message echoed to user",
-                    None,
-                    "",
-                    False
-                ),
-                (
-                    "",
-                    None,
-                    "",
-                    False
-                ),
-                (
-                    "This is a message echoed to user",
-                    ConnectionError,
-                    "No connection established",
-                    False
-                ),
-                (
-                    "",
-                    ChunkedEncodingError,
-                    "No connection established",
-                    False
-                ),
-                (
-                    "",
-                    ConnectionError,
-                    "No connection established",
-                    True
-                ),
-                (
-                    "This is a message echoed to user",
-                    ChunkedEncodingError,
-                    "No connection established",
-                    True
-                )
-            ]
+    @pytest.mark.parametrize(
+        "msg, error, error_msg, is_download",
+        [
+            (
+                "This is a message echoed to user",
+                None,
+                "",
+                False
+            ),
+            (
+                "",
+                None,
+                "",
+                False
+            ),
+            (
+                "This is a message echoed to user",
+                ConnectionError,
+                "No connection established",
+                False
+            ),
+            (
+                "",
+                ChunkedEncodingError,
+                "No connection established",
+                False
+            ),
+            (
+                "",
+                ConnectionError,
+                "No connection established",
+                True
+            ),
+            (
+                "This is a message echoed to user",
+                ChunkedEncodingError,
+                "No connection established",
+                True
+            )
+        ]
+    )
+    def test__get(self, msg, error, error_msg, is_download, mocker):
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocked_get = mocker.patch.object(requests, 'get')
+        mocker.patch.object(
+            ebook,
+            '_msg',
+            msg
         )
-        def test__get(self, msg, error, error_msg, is_download, mocker):
-            ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
-            mocked_get = mocker.patch.object(requests, 'get')
-            if error:
+        kwargs = dict()
+        spy = mocker.spy(click, "style")
+        if error and not is_download:
+            mocked_get.side_effect = error
+            response = ebook._get(**kwargs)
+            spy.assert_has_calls(
+                [
+                    mocker.call(f"\n{msg}", fg="bright_yellow"),
+                    mocker.call("No connection established", fg="bright_red")
+                ]
+            )
+        elif error and is_download:
+            with pytest.raises(error) as e:
                 mocked_get.side_effect = error
-            else:
-                mocked_get.return_value = "OK"
-                # No error occured and returns response
-                assert ebook._get() ==  "OK"
+                kwargs["is_download"] = True
+                response = ebook._get(**kwargs)
+                spy.assert_has_calls(
+                    [
+                        mocker.call(f"\n{msg}", fg="bright_yellow"),
+                        mocker.call("No connection established", fg="bright_red")
+                    ]
+                )
+                assert response == error
+        else:
+            mocked_get.return_value = "OK"
+            response = ebook._get()
+            spy.assert_called_once_with(f"\n{msg}", fg="bright_yellow")
+            # No error occured and returns response
+            assert response ==  "OK"
 
