@@ -7,7 +7,7 @@
         alt="GetDat Package Logo"
     />
     <p align="center">
-        <a href="https://www.youtube.com/watch?v=4b8P8cqc-UQ">
+        <a href="https://iv.ggtyler.dev/watch?v=4b8P8cqc-UQ">
             GetDat Theme Music
         </a>
     </p>
