@@ -65,13 +65,13 @@ class AnnasEbook:
             }
         },
         _LIBGEN_RS: {
-            "download_page": {
+            "download_page_scrape": {
                 "tag": "a"
             }
         },
         _LIBGEN_LI: {
             "url": "https://libgen.li/",
-            "download_page": {
+            "download_page_scrape": {
                 "tag": "a"
             }
         }
@@ -155,7 +155,7 @@ class AnnasEbook:
                             "link": el["href"],
                             "value": idx + 1
                         }
-            case "download_page":
+            case "download_page_scrape":
                 for idx, el in enumerate(soup.find_all(tag)):
                     # libgen pages
                     if el.string == "GET":
@@ -271,7 +271,7 @@ class AnnasEbook:
                 for libgen in self._LIBGEN_EXTERNAL:
                         if libgen in title:
                             self._current_source = libgen
-                self._scrape_key = "download_page" 
+                self._scrape_key = "download_page_scrape" 
                 results = self._scrape_results(response)
                 libgen_key = list(results.keys())[0]
                 link = results.get(libgen_key).get("link")

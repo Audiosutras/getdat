@@ -100,13 +100,13 @@ class TestAnnasEbook:
                 }
             }),
             (AnnasEbook._LIBGEN_RS, {
-                "download_page": {
+                "download_page_scrape": {
                     "tag": "a"
                 }
             }),
             (AnnasEbook._LIBGEN_LI, {
                 "url": "https://libgen.li/",
-                "download_page": {
+                "download_page_scrape": {
                     "tag": "a"
                 }
             }),
@@ -385,8 +385,39 @@ class TestAnnasEbook:
                     '11': {'title': 'English [en], epub, 0.3MB, [english] Stevenson, Robert Louis - Treasure Island.epub', 'link': '/md5/eabed0af49b234fa21c6029248816f25', 'value': 11}, 
                     '0': {'title': 'Continue in Browser', 'link': 'https://url.that-is-launched-in-browser.com', 'value': 0}
                 }
-
-
+            ),
+            (
+                AnnasEbook._SOURCE_ANNAS,
+                "detail_page_scrape",
+                "tests/static/annas_archive_detail.html",
+                {
+                    '1': {'title': 'Fast Partner Server #1', 'link': '/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/0', 'value': 1}, 
+                    '2': {'title': 'Fast Partner Server #2', 'link': '/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/1', 'value': 2}, 
+                    '3': {'title': 'Slow Partner Server #1', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/0', 'value': 3}, 
+                    '4': {'title': 'Slow Partner Server #2', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/1', 'value': 4}, 
+                    '5': {'title': 'Slow Partner Server #3', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/2', 'value': 5}, 
+                    '6': {'title': 'Libgen.li', 'link': 'http://libgen.li/ads.php?md5=4f95158d79dae74e16b5d0567be36fa6', 'value': 6}, 
+                    '7': {'title': 'Z-Library', 'link': 'https://1lib.sk/md5/4f95158d79dae74e16b5d0567be36fa6', 'value': 7}, 
+                    '0': {'title': 'Continue in Browser', 'link': 'https://url.that-is-launched-in-browser.com', 'value': 0}
+                }
+            ),
+            (
+                AnnasEbook._LIBGEN_LI,
+                "download_page_scrape",
+                "tests/static/libgen_li_detail.html",
+                {
+                    '61': {'title': 'GET', 'link': 'get.php?md5=4f95158d79dae74e16b5d0567be36fa6&key=8ETFRGFWBSSQMDRV', 'value': 61}, 
+                    '0': {'title': 'Continue in Browser', 'link': 'https://url.that-is-launched-in-browser.com', 'value': 0}
+                }
+            ),
+            (
+                AnnasEbook._LIBGEN_RS,
+                "download_page_scrape",
+                "tests/static/libgen_rs_detail.html",
+                {
+                    '1': {'title': 'GET', 'link': 'https://download.library.lol/fiction/1511000/eabed0af49b234fa21c6029248816f25.epub/Stevenson%2C%20Robert%20Louis%20-%20Treasure%20Island.epub', 'value': 1}, 
+                    '0': {'title': 'Continue in Browser', 'link': 'https://url.that-is-launched-in-browser.com', 'value': 0}
+                },
             )
         ]
     )
