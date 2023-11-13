@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "getdat"
 version = "0.1.0"
-description = ""
+description = "A command line utility for getting resources available online"
+documentation = https://github.com/Audiosutras/getdat/docs"
+repository = "https://github.com/Audiosutras/getdat"
+keywords = ["cli", "books", "movies", "episodes", "anna's archive", "movie-web"]
 authors = ["Christopher Dixon <christopher.snipes.dixon@gmail.com>"]
-readme = "README.md"
+readme = "docs/README.md"
 packages = [{include = "getdat", from = "src"}]
 
 [tool.poetry.dependencies]
