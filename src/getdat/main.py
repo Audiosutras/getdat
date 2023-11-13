@@ -3,7 +3,7 @@ import webbrowser
 from .utils import AnnasEbook, print_help
 from .constants import EBOOK_ERROR_MSG
 
-@click.group(epilog='Check out our docs at https://github.com/Audiosutras/getdat for more details')
+@click.group(epilog='Check out our docs at https://github.com/Audiosutras/getdat/docs for more details')
 def cli():
     """A command line utility for getting resources available online"""
     pass
