@@ -34,7 +34,7 @@ def cinema():
 )
 @click.argument('q', nargs=-1)
 def ebook(q, ext, output_dir):
-    """Search for a particular ebook using Anna's Archive
+    """Search and download an ebook available through Anna's Archive
     
     ex: getdat ebook <Search>
     """
