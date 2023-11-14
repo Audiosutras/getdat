@@ -13,7 +13,7 @@
     </p>
 </div>
 
-![Tests Suite](https://github.com/Audiosutras/getdat/actions/workflows/tests.yml/badge.svg?branch=master)
+![Tests](https://github.com/Audiosutras/getdat/actions/workflows/tests.yml/badge.svg?branch=master)
 
 ## Installation
 
