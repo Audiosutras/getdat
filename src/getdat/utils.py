@@ -1,9 +1,9 @@
 import click
 import os
 import requests
+import webbrowser
 from requests.exceptions import ConnectionError, ChunkedEncodingError
 from requests.models import Response
-from webbrowser import open_new_tab
 from bs4 import BeautifulSoup
 
 
@@ -236,7 +236,7 @@ class AnnasEbook:
         try:
             response = self._get(*args, **kwargs)
         except (ConnectionError, ChunkedEncodingError):
-            return open_new_tab(link)
+            return webbrowser.open_new_tab(link)
         else:
             if response.status_code != 200:
                 return click.echo(
@@ -293,13 +293,13 @@ class AnnasEbook:
                     else:
                         self._to_filesystem(response)
             else:  # Browser Only Options
-                open_new_tab(link)
+                webbrowser.open_new_tab(link)
 
     def run(self, *args, **kwargs):
         self._msg = f"Searching Anna's Archive: {self.q}"
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
-            return open_new_tab(self._selected_result.get("link"))
+            return webbrowser.open_new_tab(self._selected_result.get("link"))
         self._resource_name = self._selected_result.get("title")
         click.echo("")
         click.echo("")
@@ -313,6 +313,6 @@ class AnnasEbook:
         self._msg = "Fetching Download Links..."
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
-            return open_new_tab(self._selected_result.get("link"))
+            return webbrowser.open_new_tab(self._selected_result.get("link"))
         self._scrape_key = ""
         self._dl_or_launch_page(*args, **kwargs)

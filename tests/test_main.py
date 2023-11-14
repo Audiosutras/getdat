@@ -5,17 +5,17 @@ from click.testing import CliRunner
 from src import getdat
 from src.getdat.main import cinema, ebook
 from src.getdat.utils import AnnasEbook
-from src.getdat.constants import EBOOK_ERROR_MSG
+from src.getdat.constants import EBOOK_ERROR_MSG, MOVIE_WEB
 
 
 class TestCinema:
     runner = CliRunner()
 
     def test_cinema_launches_browser(self, mocker):
-        browser_launch = mocker.patch("webbrowser.open_new_tab")
+        browser_launch = mocker.patch.object(webbrowser, "open_new_tab")
         result = self.runner.invoke(cinema)
         assert result.exit_code == 0
-        browser_launch.assert_called_once()
+        browser_launch.assert_called_once_with(MOVIE_WEB)
 
 
 class TestEbook:

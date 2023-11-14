@@ -2,6 +2,7 @@ import os
 import click
 import pytest
 import requests
+import webbrowser
 from click.testing import CliRunner
 from requests.exceptions import ConnectionError, ChunkedEncodingError
 from src.getdat.utils import print_help, AnnasEbook
@@ -842,4 +843,98 @@ class TestAnnasEbook:
         else:
             mock_open.assert_called_once_with(resource_name, "wb")
 
-    # def test__dl_or_launch_page(self):
+    @pytest.mark.parametrize(
+        "_selected_result, response_status_code, error",
+        [
+            (
+                {
+                    "title": "Fast Partner Server #1",
+                    "link": "/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/0",
+                    "value": 1,
+                },
+                200,
+                None,
+            ),
+            (
+                {
+                    "title": "Slow Partner Server #1",
+                    "link": "/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/0",
+                    "value": 3,
+                },
+                500,
+                ConnectionError,
+            ),
+            (
+                {
+                    "title": "Libgen.li",
+                    "link": "http://libgen.li/ads.php?md5=4f95158d79dae74e16b5d0567be36fa6",
+                    "value": 6,
+                },
+                200,
+                None,
+            ),
+            (
+                {
+                    "title": "Slow Partner Server #1",
+                    "link": "/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/0",
+                    "value": 3,
+                },
+                500,
+                ChunkedEncodingError,
+            ),
+        ],
+    )
+    def test__dl_or_launch_page(
+        self, _selected_result, response_status_code, error, mocker
+    ):
+        title = _selected_result.get("title")
+
+        class MockResponse:
+            def __init__(self, status_code):
+                self._status_code = status_code
+
+            @property
+            def status_code(self):
+                return self._status_code
+
+            @property
+            def url(self):
+                return AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")
+
+            @property
+            def content(self):
+                with open(html_file_path) as f:
+                    return f.read()
+
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocked_get = mocker.patch.object(requests, "get")
+        mocker.patch.object(ebook, "_current_source", AnnasEbook._SOURCE_ANNAS)
+        mocker.patch.object(ebook, "_selected_result", _selected_result)
+        msg = f"\nTalking to {title}..."
+        mocker.patch.object(ebook, "_msg", msg)
+        launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+        echo_spy = mocker.spy(click, "echo")
+        echo_calls = [mocker.call(click.style(msg, fg="bright_yellow"))]
+
+        if error:
+            mocked_get.side_effect = error
+            ebook._dl_or_launch_page()
+            echo_calls = [
+                *echo_calls,
+                mocker.call(""),
+                mocker.call(click.style("No connection established", fg="bright_red")),
+            ]
+            echo_spy.assert_has_calls(echo_calls)
+            link = ebook._determine_link()
+            launch_browser.assert_called_once_with(link)
+
+        elif response_status_code != 200:
+            echo_calls.append(
+                mocker.call(
+                    click.style(
+                        f"Direct Download Not Available from {title}.\n Try Another Download Link",
+                        fg="red",
+                    )
+                )
+            )
+            echo_spy.assert_has_calls(echo_calls)
