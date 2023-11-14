@@ -1,5 +1,5 @@
 import click
-from os import path, environ
+import os
 import requests
 from requests.exceptions import ConnectionError, ChunkedEncodingError
 from requests.models import Response
@@ -86,7 +86,7 @@ class AnnasEbook:
 
     def __init__(self, q: tuple,  ext: str, output_dir: str):
         self.q = ' '.join(map(str, q))
-        self.output_dir = output_dir or environ.get('GETDAT_BOOK_DIR')  
+        self.output_dir = output_dir or os.environ.get('GETDAT_BOOK_DIR')  
         self.ext = ext
     
     def _determine_source(self) -> dict:
@@ -228,7 +228,7 @@ class AnnasEbook:
     def _to_filesystem(self, response: Response):
         resource_name = self._resource_name.split(", ", 3)[-1]
         if self.output_dir:
-            resource_path = path.join(path.expanduser(self.output_dir), resource_name)
+            resource_path = os.path.join(os.path.expanduser(self.output_dir), resource_name)
             with open(resource_path, "wb") as f:
                 f.write(response.content)
         else:
