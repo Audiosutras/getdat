@@ -1,5 +1,5 @@
 name: Tests Suite
-description: 'Runs test suite associated with python package'
+
 on:
   push:
     branches:
