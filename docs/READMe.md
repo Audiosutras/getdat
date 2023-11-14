@@ -152,7 +152,7 @@ To run tests
 (getdat-py3.11) -> pytest -v
 ```
 
-Setup [pre-commit](https://pre-commit.com/)
+Style guide and code check enforced with [pre-commit](https://pre-commit.com/)
 ```
 (getdat-py3.11) -> pre-commit install
 ```

@@ -32,7 +32,10 @@ jobs:
           pipx install poetry
 
       - name: Install Dependencies & Test Dependencies
-        run: poetry install --with test
+        run: poetry install
+
+      - name: Style Guide Check & Code Check
+        run: poetry run pre-commit run -a
 
       - name: Run Pytest
         run: poetry run pytest -v
