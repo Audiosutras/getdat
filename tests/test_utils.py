@@ -537,8 +537,41 @@ class TestAnnasEbook:
             ),
         ]
     )
-    def test__echo_results(self, _scrape_key, results, expected_to_have_results):
+    def test__echo_results(self, _scrape_key, results, expected_to_have_results, mocker):
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
-        have_results = ebook._echo_results(results)
-        assert have_results == expected_to_have_results
-
+        match len(results.keys()):
+            case 0:
+                have_results = ebook._echo_results(results)
+                assert have_results == expected_to_have_results
+            case 1:
+                spy = mocker.spy(click, "echo")
+                have_results = ebook._echo_results(results)
+                spy.assert_called_once_with("No Search Results Found")
+                assert have_results == expected_to_have_results
+            case _:
+                spy_style = mocker.spy(click, "style")
+                spy_echo = mocker.spy(click, "echo")
+                have_results = ebook._echo_results(results)
+                spy_style.assert_has_calls(
+                    [
+                        mocker.call("Search Results", fg="bright_cyan"),
+                        mocker.call("==============", fg="bright_cyan")
+                    ]
+                )
+                result_calls = []
+                for key in results.keys():
+                    value = results.get(key)
+                    title = value.get(key)
+                    if key == "0":
+                        key_calls = [
+                            mocker.call(""),
+                            mocker.call(click.style(f" {key} | {title}", blink=True))
+                        ]
+                    
+                spy_echo.assert_has_calls(
+                    [
+                        mocker.call(""),
+                        *result_calls
+                    ]
+                )
+                assert have_results == expected_to_have_results
