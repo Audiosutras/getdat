@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.11]
-  
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -30,10 +30,9 @@ jobs:
           python3 -m pip install --user pipx
           python3 -m pipx ensurepath
           pipx install poetry
-      
+
       - name: Install Dependencies & Test Dependencies
         run: poetry install --with test
 
       - name: Run Pytest
         run: poetry run pytest -v
-

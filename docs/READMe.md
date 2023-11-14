@@ -45,13 +45,13 @@ Launches [movie-web.app](https://movie-web.app/search/movie) in your default bro
 -> getdat cinema
 ```
 
-## Ebook 
+## Ebook
 Search and download an ebook available through [Anna's Archive](https://annas-archive.org/). You can think of this command as "headless" Anna's Archive
 
 <div align="center">
     <img
         src="/docs/static/getdat-ebook.gif"
-        alt="Gif of GetDat Cinema Command In Action"   
+        alt="Gif of GetDat Cinema Command In Action"
     />
 </div>
 
@@ -66,7 +66,7 @@ Search and download an ebook available through [Anna's Archive](https://annas-ar
 
 #### ARGUMENTS
 
-| Name | Help | 
+| Name | Help |
 |------|------|
 | Q    | Search |
 
@@ -84,7 +84,7 @@ or
 | Name | Convention 1 | Convention 2 | Type | Help |
 | ---- | ------------ | ------------ | ----| ----|
 | Output Directory | -o | --output_dir | Text | Path to ebook's output directory from home directory. Path must be prefixed by `~` on Unix or `~user` on Windows. This argument overrides `GETDAT_BOOK_DIR` env var if set. Outputs book to working directory if neither are set.
-| Extension | -e | --ext | [epub | pdf] | Preferred ebook extension for search results 
+| Extension | -e | --ext | [epub | pdf] | Preferred ebook extension for search results
 
 Example:
 ```bash
@@ -97,7 +97,7 @@ or
 
 #### Environment Variable
 
-- `GETDAT_BOOK_DIR` - See [Options](#options) `--output_dir` for more information 
+- `GETDAT_BOOK_DIR` - See [Options](#options) `--output_dir` for more information
 
 #### Notes
 * Tests are a work in progress for this command
@@ -118,14 +118,14 @@ This python package uses [poetry](https://python-poetry.org/docs/) for dependenc
 -> python3 -m pip install --user pipx
 -> python3 -m pipx ensurepath
 # install poetry
--> pipx install poetry 
+-> pipx install poetry
 ```
 
 Assuming that you have *forked the repository* and have a copy on your local machine. Within the `getdat` directory, install dependencies and open a `virtualenv` shell managed by poetry.
 ```bash
 -> poetry install
 -> poetry shell
-(getdat-py3.11) -> 
+(getdat-py3.11) ->
 ```
 
 To run/develop the cli program.
@@ -148,6 +148,11 @@ Commands:
 ```
 
 To run tests
-```
+```bash
 (getdat-py3.11) -> pytest -v
+```
+
+Setup [pre-commit](https://pre-commit.com/)
+```
+(getdat-py3.11) -> pre-commit install
 ```
