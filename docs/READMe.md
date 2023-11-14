@@ -7,7 +7,7 @@
         height="400"
     />
     <p align="center">
-        <a href="https://iv.ggtyler.dev/watch?v=4b8P8cqc-UQ">
+        <a href="https://iv.ggtyler.dev/watch?v=4b8P8cqc-UQ" target="_blank">
             GetDat Theme Music
         </a>
     </p>
