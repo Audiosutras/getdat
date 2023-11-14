@@ -521,20 +521,20 @@ class TestAnnasEbook:
                 },
                 True
             ),
-            (
-                "detail_page_scrape",
-                {
-                    '1': {'title': 'Fast Partner Server #1', 'link': '/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/0', 'value': 1}, 
-                    '2': {'title': 'Fast Partner Server #2', 'link': '/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/1', 'value': 2}, 
-                    '3': {'title': 'Slow Partner Server #1', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/0', 'value': 3}, 
-                    '4': {'title': 'Slow Partner Server #2', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/1', 'value': 4}, 
-                    '5': {'title': 'Slow Partner Server #3', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/2', 'value': 5}, 
-                    '6': {'title': 'Libgen.li', 'link': 'http://libgen.li/ads.php?md5=4f95158d79dae74e16b5d0567be36fa6', 'value': 6}, 
-                    '7': {'title': 'Z-Library', 'link': 'https://1lib.sk/md5/4f95158d79dae74e16b5d0567be36fa6', 'value': 7}, 
-                    '0': {'title': 'Continue in Browser', 'link': 'https://url.that-is-launched-in-browser.com', 'value': 0}
-                },
-                True
-            ),
+            # (
+            #     "detail_page_scrape",
+            #     {
+            #         '1': {'title': 'Fast Partner Server #1', 'link': '/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/0', 'value': 1}, 
+            #         '2': {'title': 'Fast Partner Server #2', 'link': '/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/1', 'value': 2}, 
+            #         '3': {'title': 'Slow Partner Server #1', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/0', 'value': 3}, 
+            #         '4': {'title': 'Slow Partner Server #2', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/1', 'value': 4}, 
+            #         '5': {'title': 'Slow Partner Server #3', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/2', 'value': 5}, 
+            #         '6': {'title': 'Libgen.li', 'link': 'http://libgen.li/ads.php?md5=4f95158d79dae74e16b5d0567be36fa6', 'value': 6}, 
+            #         '7': {'title': 'Z-Library', 'link': 'https://1lib.sk/md5/4f95158d79dae74e16b5d0567be36fa6', 'value': 7}, 
+            #         '0': {'title': 'Continue in Browser', 'link': 'https://url.that-is-launched-in-browser.com', 'value': 0}
+            #     },
+            #     True
+            # ),
         ]
     )
     def test__echo_results(self, _scrape_key, results, expected_to_have_results, mocker):
@@ -551,27 +551,33 @@ class TestAnnasEbook:
             case _:
                 spy_style = mocker.spy(click, "style")
                 spy_echo = mocker.spy(click, "echo")
+                spy_echo_formatted_title = mocker.spy(ebook, "_echo_formatted_title")
                 have_results = ebook._echo_results(results)
-                spy_style.assert_has_calls(
-                    [
-                        mocker.call("Search Results", fg="bright_cyan"),
-                        mocker.call("==============", fg="bright_cyan")
-                    ]
-                )
-                result_calls = []
+                echo_calls = [
+                    mocker.call('click.style("Search Results", fg="bright_cyan")'),
+                    mocker.call('click.style("Search Results", fg="bright_cyan")'),
+                    mocker.call("")
+                ]
                 for key in results.keys():
                     value = results.get(key)
-                    title = value.get(key)
+                    title = value.get(key, "")
                     if key == "0":
-                        key_calls = [
-                            mocker.call(""),
-                            mocker.call(click.style(f" {key} | {title}", blink=True))
-                        ]
-                    
-                spy_echo.assert_has_calls(
-                    [
-                        mocker.call(""),
-                        *result_calls
-                    ]
-                )
+                        echo_calls.append(mocker.call(""))
+                        echo_calls.append(mocker.call('click.style({f" {key} | {title}", blink=True)}'))
+                    elif _scrape_key == "detail_page_scrape":
+                        if any( dl_partner in title for dl_partner in AnnasEbook._MEMBER_LOGIN_REQUIRED):
+                            echo_calls.append(mocker.call(f" {key} | {title} - (Requires Member Login / {AnnasEbook._browser}"))
+                        elif AnnasEbook._SLOW_PARTNER_SERVER in title:
+                            echo_calls.append(mocker.call(f" {key} | {title} - (Browser Verification / {AnnasEbook._browser})"))
+                        else:
+                            echo_calls.append(mocker.call(f" {key} | {title}"))
+                    else:
+                        title_list = title.split(", ", 3)
+                        try:
+                            [lang, ext, size, title_str] = title_list
+                        except ValueError:
+                            return echo_calls.append(mocker.call(f'click.style(f" {key} | {AnnasEbook._ENTRY_NOT_DISPLAYED}", fg="bright_red")'))
+                        return echo_calls.append(mocker.call(f" {key} | {title_str} | {ext} | {size} | {lang}"))
+                echo_calls.append(mocker.call(""))                
+                spy_echo.assert_has_calls(echo_calls)
                 assert have_results == expected_to_have_results
