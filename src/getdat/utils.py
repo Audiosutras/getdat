@@ -15,6 +15,7 @@ def print_help(msg: str):
 
 class AnnasEbook:
     
+    _ENTRY_NOT_DISPLAYED = "Entry information could not be displayed"
     _FAST_PARTNER_SERVER = 'Fast Partner Server'
     _SLOW_PARTNER_SERVER = 'Slow Partner Server'
     _INTERNET_ARCHIVE = 'Borrow from the Internet Archive'
@@ -172,13 +173,13 @@ class AnnasEbook:
         }
         return results
 
-    @staticmethod
-    def _echo_formatted_title(key, title_str):
+
+    def _echo_formatted_title(self, key, title_str):
             title_list = title_str.split(", ", 3)
             try:
                 [lang, ext, size, title] = title_list
             except ValueError:
-                return click.echo(click.style(f" {key} | Entry information could not be displayed", fg="bright_red"))
+                return click.echo(click.style(f" {key} | {self._ENTRY_NOT_DISPLAYED}", fg="bright_red"))
             return click.echo(f" {key} | {title} | {ext} | {size} | {lang}")
     
     def _echo_results(self, results) -> bool:

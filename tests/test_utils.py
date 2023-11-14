@@ -448,4 +448,35 @@ class TestAnnasEbook:
         results = ebook._scrape_results(response=response)
         assert results == expected_results
 
-
+    @pytest.mark.parametrize(
+        "key, title_str, expected_str",
+        [
+            (
+                '1',
+                'English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub',
+                ' 1 | Treasure Island - Stevenson, Robert Louis.epub | epub | 0.3MB | English [en]',
+            ),
+            (   2, 
+                'English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub',
+                ' 2 | Treasure Island - Stevenson, Robert Louis.epub | epub | 0.3MB | English [en]',
+            ),
+            (   3, 
+                'English [en], epub, Treasure Island - Stevenson Robert Louis.epub',
+                f' 3 | {AnnasEbook._ENTRY_NOT_DISPLAYED}'
+            ),
+            (   '4', 
+                'Treasure Island - Stevenson, Robert Louis.epub',
+                f' 4 | {AnnasEbook._ENTRY_NOT_DISPLAYED}'
+            )
+        ]
+    )
+    def test__echo_formatted_title(self, key, title_str, expected_str, mocker):
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        if AnnasEbook._ENTRY_NOT_DISPLAYED in expected_str:
+            spy = mocker.spy(click, "style")
+            ebook._echo_formatted_title(key, title_str)
+            spy.assert_called_once_with(expected_str, fg="bright_red")
+        else:
+            spy = mocker.spy(click, "echo")
+            ebook._echo_formatted_title(key, title_str)
+            spy.assert_called_once_with(expected_str)
