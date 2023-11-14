@@ -586,3 +586,66 @@ class TestAnnasEbook:
                 echo_calls.append(mocker.call(""))                
                 spy_echo.assert_has_calls(echo_calls)
                 assert have_results == expected_to_have_results
+
+    @pytest.mark.parametrize(
+        "_current_source, _scrape_key, html_file_path, expected_value, expected_selected_result",
+        [
+            (
+                AnnasEbook._SOURCE_ANNAS,
+                "search_page_scrape",
+                "tests/static/annas_archive_search.html",
+                5,
+                {'title': 'English [en], pdf, 14.6MB, treasureisland0000stev_f7z0.pdf', 'link': '/md5/e5f954e12ce182fd530f7c16429a2134', 'value': 5}
+            ),
+            (
+                AnnasEbook._SOURCE_ANNAS,
+                "detail_page_scrape",
+                "tests/static/annas_archive_detail.html",
+                3,
+                {'title': 'Slow Partner Server #1', 'link': '/slow_download/4f95158d79dae74e16b5d0567be36fa6/0/0', 'value': 3}
+            ),
+        ]
+    )
+    def test__scrape_page(self,
+        _current_source, 
+        _scrape_key, 
+        html_file_path, 
+        expected_value, 
+        expected_selected_result,
+        mocker
+    ):
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocker.patch.object(
+            ebook,
+            '_current_source',
+            _current_source
+        )
+        mocker.patch.object(
+            ebook,
+            '_scrape_key',
+            _scrape_key
+        )
+        mocker.patch.object(
+            click,
+            "prompt",
+            return_value=expected_value
+        )
+        mock_get = mocker.patch.object(ebook, "_get")
+
+        class MockResponse:
+
+            @property
+            def url(self):
+                return AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")
+
+            @property
+            def content(self):
+                with open(html_file_path) as f:
+                    return f.read()
+        
+        mock_get.return_value = MockResponse()
+        value = ebook._scrape_page()
+        assert value == expected_value
+        assert ebook._selected_result == expected_selected_result
+
+    
