@@ -13,6 +13,8 @@
     </p>
 </div>
 
+![Tests Suite](https://github.com/Audiosutras/getdat/actions/workflows/tests.yml/badge.svg?branch=master)
+
 ## Installation
 
 Once Unit Testing for the `ebook` command is complete this package will be made available on pypi.org. Currently to install run:
