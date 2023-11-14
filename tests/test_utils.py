@@ -694,4 +694,4 @@ class TestAnnasEbook:
             resource_path = os.path.join(os.path.expanduser(output_dir), resource_name)
             mock_open.assert_called_once_with(resource_path, 'wb')
         else:
-            mock_open.assert_called_once_with(resource_name, 'rb')
+            mock_open.assert_called_once_with(resource_name, 'wb')
