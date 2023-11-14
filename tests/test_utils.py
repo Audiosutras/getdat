@@ -648,4 +648,50 @@ class TestAnnasEbook:
         assert value == expected_value
         assert ebook._selected_result == expected_selected_result
 
+    @pytest.mark.parametrize(
+        "_resource_name, html_file_path, output_dir",
+        [
+            (
+                'English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub',
+                "tests/static/annas_archive_detail.html",
+                "~/books/epub/dir"
+            ),
+            (
+                'English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub',
+                "tests/static/annas_archive_detail.html",
+                ""
+            )
+        ]
+    )
+    def test__to_filesystem(self, _resource_name, html_file_path, output_dir, mocker):
+        class MockResponse:
+
+            @property
+            def url(self):
+                return AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")
+
+            @property
+            def content(self):
+                with open(html_file_path) as f:
+                    return f.read()
     
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocker.patch.object(
+            ebook,
+            '_resource_name',
+            _resource_name
+        )
+        mocker.patch.object(
+            ebook,
+            'output_dir',
+            output_dir
+        )
+        mock_open = mocker.mock_open()
+        mocker.patch("src.getdat.utils.open", mock_open)
+        ebook._to_filesystem(response=MockResponse())
+        resource_name = _resource_name.split(", ", 3)[-1]
+        if output_dir:
+            resource_path = os.path.join(os.path.expanduser(output_dir), resource_name)
+            mock_open.assert_called_once_with(resource_path, 'wb')
+        else:
+            mock_open.assert_called_once_with(resource_name, 'wb')
