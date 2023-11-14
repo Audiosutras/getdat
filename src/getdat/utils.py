@@ -279,7 +279,7 @@ class AnnasEbook:
                 self._msg = ""
                 if title == self._LIBGEN_LI:
                     source = self._determine_source()
-                    link = f"{source.get("url")}{link}"
+                    link = f"{source.get('url')}{link}"
                     kwargs["link"] = link
                     try:
                         response = self._get(*args, **kwargs)

@@ -129,7 +129,7 @@ class TestAnnasEbook:
             ({"link": "http://shady-books.google.com"}, "http://shady-books.google.com"),
             (
                 {"link": "/md5/234890238402380423"}, 
-                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/md5/234890238402380423"
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/md5/234890238402380423"
             )
         ]
     )
@@ -156,7 +156,7 @@ class TestAnnasEbook:
                 AnnasEbook._SOURCE_ANNAS, 
                 {},
                 "search_page_scrape",
-                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/search?q={SEARCH}&ext=epub",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=epub",
             ),
             (
                 "pdf",
@@ -164,7 +164,7 @@ class TestAnnasEbook:
                 AnnasEbook._SOURCE_ANNAS, 
                 {},
                 "search_page_scrape",
-                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/search?q={SEARCH}&ext=pdf",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=pdf",
             ),
             (
                 "",
@@ -172,7 +172,7 @@ class TestAnnasEbook:
                 AnnasEbook._SOURCE_ANNAS, 
                 {},
                 "search_page_scrape",
-                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/search?q={SEARCH}",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}",
             ),
             (
                 "pdf",
@@ -220,7 +220,7 @@ class TestAnnasEbook:
                 AnnasEbook._SOURCE_ANNAS,
                 {"link": "/md5/234890238402380423"},
                 None,
-                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")}/md5/234890238402380423"
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/md5/234890238402380423"
             ),
             (
                 "epub",
@@ -236,7 +236,7 @@ class TestAnnasEbook:
                 AnnasEbook._LIBGEN_LI,
                 {"link": "/md5/234890238402380423"},
                 None,
-                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._LIBGEN_LI].get("url")}/md5/234890238402380423"
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._LIBGEN_LI].get('url')}/md5/234890238402380423"
             ),
             (
                 "",
@@ -695,3 +695,7 @@ class TestAnnasEbook:
             mock_open.assert_called_once_with(resource_path, 'wb')
         else:
             mock_open.assert_called_once_with(resource_name, 'wb')
+    
+    # def test__dl_or_launch_page(self):
+
+

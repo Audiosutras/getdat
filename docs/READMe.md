@@ -104,12 +104,12 @@ or
 
 ## Local Development
 
-Python Version: `3.12`. To install python on Unix systems
+Python Version: `3.11`. To install python on Unix systems
 ```bash
 -> sudo apt install software-properties-common
 -> sudo add-apt-repository ppa:deadsnakes/ppa
 -> sudo apt update
--> sudo apt install python3.12
+-> sudo apt install python3.11
 ```
 
 This python package uses [poetry](https://python-poetry.org/docs/) for dependency management. To install:
@@ -125,12 +125,12 @@ Assuming that you have *forked the repository* and have a copy on your local mac
 ```bash
 -> poetry install
 -> poetry shell
-(getdat-py3.12) -> 
+(getdat-py3.11) -> 
 ```
 
 To run/develop the cli program.
 ```bash
-(getdat-py3.12) -> getdat
+(getdat-py3.11) -> getdat
 Usage: getdat [OPTIONS] COMMAND [ARGS]...
 
   A command line utility for getting resources available online
@@ -149,5 +149,5 @@ Commands:
 
 To run tests
 ```
-(getdat-py3.12) -> pytest -v
+(getdat-py3.11) -> pytest -v
 ```
