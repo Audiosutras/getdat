@@ -57,7 +57,7 @@ Search and download an ebook available through [Anna's Archive](https://annas-ar
 
 * The demo for this command downloaded an epub format of Robert Louis Stevenson's and N.C. Wyeth's book *Treasure Island*. This book is in the public domain.
 * The demo for this command opens the downloaded ebook using [epr](https://github.com/wustho/epr), a terminal epub reader to show the contents of the downloaded book. You can expect higher ebook quality by using a desktop e-reader like [librum](https://librumreader.com/)
-* Anna's Archive `SciDB` search is not yest supported.
+* Anna's Archive `SciDB` search is not yet supported.
 
 
 ```bash
@@ -147,7 +147,7 @@ Commands:
 
 ```
 
-To run tests
+Project uses [pytest](https://docs.pytest.org/en/7.4.x/) for testing. Test run quickly with the help of [pytest-mock](https://pytest-mock.readthedocs.io/en/latest/usage.html)
 ```bash
 (getdat-py3.11) -> pytest -v
 ```
