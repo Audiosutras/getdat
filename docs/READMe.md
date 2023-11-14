@@ -17,10 +17,12 @@
 
 ## Installation
 
-Once Unit Testing for the `ebook` command is complete this package will be made available on pypi.org. Currently to install run:
+Once Unit Testing for the `ebook` command is complete this package will be made available on pypi.org. Currently install using `pipx`:
 
 ```bash
-pipx install git+https://github.com/Audiosutras/getdat.git
+-> python3 -m pip install --user pipx
+-> python3 -m pipx ensurepath
+-> pipx install git+https://github.com/Audiosutras/getdat.git
 ```
 
 ## Commands
@@ -84,6 +86,68 @@ or
 | Output Directory | -o | --output_dir | Text | Path to ebook's output directory from home directory. Path must be prefixed by `~` on Unix or `~user` on Windows. This argument overrides `GETDAT_BOOK_DIR` env var if set. Outputs book to working directory if neither are set.
 | Extension | -e | --ext | [epub | pdf] | Preferred ebook extension for search results 
 
+Example:
+```bash
+-> getdat ebook Treasure Island Stevenson --ext=epub --output_dir=~/books/epub/
+```
+or
+```bash
+-> getdat ebook "Treasure Island Stevensonn" -e epub -o ~/books/epub
+```
+
+#### Environment Variable
+
+- `GETDAT_BOOK_DIR` - See [Options](#options) `--output_dir` for more information 
 
 #### Notes
 * Tests are a work in progress for this command
+
+## Local Development
+
+Python Version: `3.12`. To install python on Unix systems
+```bash
+-> sudo apt install software-properties-common
+-> sudo add-apt-repository ppa:deadsnakes/ppa
+-> sudo apt update
+-> sudo apt install python3.12
+```
+
+This python package uses [poetry](https://python-poetry.org/docs/) for dependency management. To install:
+```bash
+# install pipx if you have not already
+-> python3 -m pip install --user pipx
+-> python3 -m pipx ensurepath
+# install poetry
+-> pipx install poetry 
+```
+
+Assuming that you have *forked the repository* and have a copy on your local machine. Within the `getdat` directory, install dependencies and open a `virtualenv` shell managed by poetry.
+```bash
+-> poetry install
+-> poetry shell
+(getdat-py3.12) -> 
+```
+
+To run/develop the cli program.
+```bash
+(getdat-py3.12) -> getdat
+Usage: getdat [OPTIONS] COMMAND [ARGS]...
+
+  A command line utility for getting resources available online
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  cinema  Launches movie-web.app in your default browser
+  ebook   Search and download an ebook available through Anna's Archive...
+
+  Check out our docs at https://github.com/Audiosutras/getdat/docs for more
+  details
+
+```
+
+To run tests
+```
+(getdat-py3.12) -> pytest -v
+```
