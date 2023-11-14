@@ -22,9 +22,9 @@ on:
             python-version: ${{ matrix.python-version }}
 
         - name: Install Pipx & Poetry
-            run: python3 -m pip install --user pipx
-            run: python3 -m pipx ensurepath
-            run: pipx install poetry
+          run: python3 -m pip install --user pipx
+          run: python3 -m pipx ensurepath
+          run: pipx install poetry
         
         - name: Install Dependencies & Test Dependencies
           run: poetry install --with test
