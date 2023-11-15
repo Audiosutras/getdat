@@ -844,7 +844,11 @@ class TestAnnasEbook:
             mock_open.assert_called_once_with(resource_name, "wb")
 
     @pytest.mark.parametrize(
-        "_selected_result, response_status_code, error, response_content_type, is_ipfs",
+        (
+            "_selected_result, response_status_code, "
+            "error, response_content_type, is_ipfs, "
+            "is_libgen, page_results"
+        ),
         [
             (
                 {
@@ -856,6 +860,8 @@ class TestAnnasEbook:
                 None,
                 AnnasEbook._PDF_CONTENT_TYPE,
                 False,
+                False,
+                None,
             ),
             (
                 {
@@ -867,6 +873,8 @@ class TestAnnasEbook:
                 None,
                 AnnasEbook._HTML_CONTENT_TYPE,
                 False,
+                False,
+                None,
             ),
             (
                 {
@@ -878,6 +886,8 @@ class TestAnnasEbook:
                 None,
                 AnnasEbook._HTML_CONTENT_TYPE,
                 True,
+                False,
+                None,
             ),
             (
                 {
@@ -889,6 +899,8 @@ class TestAnnasEbook:
                 ConnectionError,
                 AnnasEbook._PDF_CONTENT_TYPE,
                 False,
+                False,
+                None,
             ),
             (
                 {
@@ -900,6 +912,8 @@ class TestAnnasEbook:
                 None,
                 AnnasEbook._HTML_CONTENT_TYPE,
                 True,
+                False,
+                None,
             ),
             (
                 {
@@ -911,16 +925,68 @@ class TestAnnasEbook:
                 ChunkedEncodingError,
                 AnnasEbook._EPUB_CONTENT_TYPE,
                 False,
+                False,
+                None,
+            ),
+            (
+                {
+                    "title": AnnasEbook._LIBGEN_LI,
+                    "link": "app.php?md5=4f95158d79dae74e16b5d0567be36fa6",
+                    "value": 6,
+                },
+                200,
+                None,
+                AnnasEbook._HTML_CONTENT_TYPE,
+                False,
+                True,
+                {
+                    "61": {
+                        "title": "GET",
+                        "link": "get.php?md5=4f95158d79dae74e16b5d0567be36fa6&key=8ETFRGFWBSSQMDRV",
+                        "value": 61,
+                    },
+                    "0": {
+                        "title": "Continue in Browser",
+                        "link": "https://url.that-is-launched-in-browser.com",
+                        "value": 0,
+                    },
+                },
+            ),
+            (
+                {
+                    "title": AnnasEbook._LIBGEN_RS,
+                    "link": "app.php?md5=4f95158d79dae74e16b5d0567be36fa6",
+                    "value": 6,
+                },
+                200,
+                None,
+                AnnasEbook._HTML_CONTENT_TYPE,
+                False,
+                True,
+                {
+                    "1": {
+                        "title": "GET",
+                        "link": "https://download.library.lol/fiction/1511000/eabed0af49b234fa21c6029248816f25.epub/Stevenson%2C%20Robert%20Louis%20-%20Treasure%20Island.epub",
+                        "value": 1,
+                    },
+                    "0": {
+                        "title": "Continue in Browser",
+                        "link": "https://url.that-is-launched-in-browser.com",
+                        "value": 0,
+                    },
+                },
             ),
         ],
     )
-    def test__dl_or_launch_page_non_libgen(
+    def test__dl_or_launch_page(
         self,
         _selected_result,
         response_status_code,
         error,
         response_content_type,
         is_ipfs,
+        is_libgen,
+        page_results,
         mocker,
     ):
         title = _selected_result.get("title")
@@ -946,7 +1012,7 @@ class TestAnnasEbook:
 
             @property
             def content(self):
-                with open(html_file_path) as f:
+                with open("tests/static/libgen_rs_detail.html") as f:
                     return f.read()
 
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
@@ -1012,6 +1078,29 @@ class TestAnnasEbook:
                     ),
                 ]
                 echo_spy.assert_has_calls(echo_calls)
+
+        elif response_content_type == AnnasEbook._HTML_CONTENT_TYPE and is_libgen:
+            mock_scrape_results = mocker.patch.object(
+                ebook,
+                "_scrape_results",
+            )
+            mock_download = mocker.patch.object(ebook, "_download")
+            mock_scrape_results.return_value = page_results
+            mocked_get.return_value = MockResponse(
+                status_code=response_status_code, content_type=response_content_type
+            )
+            ebook._dl_or_launch_page()
+
+            if title == AnnasEbook._LIBGEN_LI:
+                link = page_results["61"].get("link")
+                url = AnnasEbook._SOURCE_DICT[AnnasEbook._LIBGEN_LI].get("url")
+                mock_download.assert_called_once_with(
+                    title, is_download=True, link=f"{url}{link}"
+                )
+            elif title == AnnasEbook._LIBGEN_RS:
+                mock_download.assert_called_once_with(
+                    title, is_download=True, link=page_results["1"].get("link")
+                )
         else:
             launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
             mocked_get.return_value = MockResponse(

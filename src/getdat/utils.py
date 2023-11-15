@@ -228,6 +228,19 @@ class AnnasEbook:
             with open(resource_name, "wb") as f:
                 f.write(response.content)
 
+    def _download(self, title, *args, **kwargs):
+        try:
+            response = self._get(*args, **kwargs)
+        except (ConnectionError, ChunkedEncodingError):
+            return click.echo(
+                click.style(
+                    f"Direct Download Not Available from {title}.\n Try Another Download Link",
+                    fg="red",
+                )
+            )
+        else:
+            self._to_filesystem(response)
+
     def _dl_or_launch_page(self, *args, **kwargs):
         title = self._selected_result.get("title")
         link = self._determine_link()
@@ -268,30 +281,10 @@ class AnnasEbook:
                     source = self._determine_source()
                     link = f"{source.get('url')}{link}"
                     kwargs["link"] = link
-                    try:
-                        response = self._get(*args, **kwargs)
-                    except (ConnectionError, ChunkedEncodingError):
-                        return click.echo(
-                            click.style(
-                                f"Direct Download Not Available from {title}.\n Try Another Download Link",
-                                fg="red",
-                            )
-                        )
-                    else:
-                        self._to_filesystem(response)
+                    self._download(title, *args, **kwargs)
                 elif title == self._LIBGEN_RS:
                     kwargs["link"] = link
-                    try:
-                        response = self._get(*args, **kwargs)
-                    except (ConnectionError, ChunkedEncodingError):
-                        return click.echo(
-                            click.style(
-                                f"Direct Download Not Available from {title}.\n Try Another Download Link",
-                                fg="red",
-                            )
-                        )
-                    else:
-                        self._to_filesystem(response)
+                    self._download(title, *args, **kwargs)
             else:  # Browser Only Options
                 webbrowser.open_new_tab(link)
 
