@@ -844,7 +844,7 @@ class TestAnnasEbook:
             mock_open.assert_called_once_with(resource_name, "wb")
 
     @pytest.mark.parametrize(
-        "_selected_result, response_status_code, error",
+        "_selected_result, response_status_code, error, response_content_type, is_ipfs",
         [
             (
                 {
@@ -854,6 +854,30 @@ class TestAnnasEbook:
                 },
                 200,
                 None,
+                AnnasEbook._PDF_CONTENT_TYPE,
+                False,
+            ),
+            (
+                {
+                    "title": "Fast Partner Server #1 Continue in Browser",
+                    "link": "/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/0",
+                    "value": 1,
+                },
+                200,
+                None,
+                AnnasEbook._HTML_CONTENT_TYPE,
+                False,
+            ),
+            (
+                {
+                    "title": "Fast Partner Server #1 IPFS",
+                    "link": "/ipfs/fast_download/4f95158d79dae74e16b5d0567be36fa6/0/0",
+                    "value": 1,
+                },
+                200,
+                None,
+                AnnasEbook._HTML_CONTENT_TYPE,
+                True,
             ),
             (
                 {
@@ -863,15 +887,19 @@ class TestAnnasEbook:
                 },
                 500,
                 ConnectionError,
+                AnnasEbook._PDF_CONTENT_TYPE,
+                False,
             ),
             (
                 {
-                    "title": "Libgen.li",
-                    "link": "http://libgen.li/ads.php?md5=4f95158d79dae74e16b5d0567be36fa6",
+                    "title": "IPFS Gateway #1",
+                    "link": "https://cloudflare-ipfs/ipfs/md5=4f95158d79dae74e16b5d0567be36fa6",
                     "value": 6,
                 },
                 200,
                 None,
+                AnnasEbook._HTML_CONTENT_TYPE,
+                True,
             ),
             (
                 {
@@ -881,17 +909,32 @@ class TestAnnasEbook:
                 },
                 500,
                 ChunkedEncodingError,
+                AnnasEbook._EPUB_CONTENT_TYPE,
+                False,
             ),
         ],
     )
-    def test__dl_or_launch_page(
-        self, _selected_result, response_status_code, error, mocker
+    def test__dl_or_launch_page_non_libgen(
+        self,
+        _selected_result,
+        response_status_code,
+        error,
+        response_content_type,
+        is_ipfs,
+        mocker,
     ):
         title = _selected_result.get("title")
 
         class MockResponse:
-            def __init__(self, status_code):
+            def __init__(self, status_code, content_type):
                 self._status_code = status_code
+                self._content_type = content_type
+
+            @property
+            def headers(self):
+                headers = dict()
+                headers["Content-Type"] = self._content_type
+                return headers
 
             @property
             def status_code(self):
@@ -929,6 +972,8 @@ class TestAnnasEbook:
             launch_browser.assert_called_once_with(link)
 
         elif response_status_code != 200:
+            mocked_get.return_value = MockResponse()
+            ebook._dl_or_launch_page()
             echo_calls.append(
                 mocker.call(
                     click.style(
@@ -938,3 +983,40 @@ class TestAnnasEbook:
                 )
             )
             echo_spy.assert_has_calls(echo_calls)
+
+        elif response_content_type in AnnasEbook._EXPECTED_DL_CONTENT_TYPES:
+            response = MockResponse(
+                status_code=response_status_code, content_type=response_content_type
+            )
+            mocked_get.return_value = response
+            mock_to_fs = mocker.patch.object(ebook, "_to_filesystem")
+            ebook._dl_or_launch_page()
+            mock_to_fs.assert_called_once_with(response)
+            echo_spy.assert_has_calls(echo_calls)
+
+        elif response_content_type == AnnasEbook._HTML_CONTENT_TYPE and is_ipfs:
+            mocked_get.return_value = MockResponse(
+                status_code=response_status_code, content_type=response_content_type
+            )
+            ebook._dl_or_launch_page()
+            link = ebook._determine_link()
+            if AnnasEbook._IPFS_URI in link:
+                echo_calls = [
+                    *echo_calls,
+                    mocker.call(""),
+                    mocker.call(
+                        click.style(
+                            f"Direct Download Not Available from {title}.\n Try Another Download Link",
+                            fg="red",
+                        )
+                    ),
+                ]
+                echo_spy.assert_has_calls(echo_calls)
+        else:
+            launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+            mocked_get.return_value = MockResponse(
+                status_code=response_status_code, content_type=response_content_type
+            )
+            ebook._dl_or_launch_page()
+            link = ebook._determine_link()
+            launch_browser.assert_called_once_with(link)
