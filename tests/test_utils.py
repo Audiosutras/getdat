@@ -844,6 +844,50 @@ class TestAnnasEbook:
             mock_open.assert_called_once_with(resource_name, "wb")
 
     @pytest.mark.parametrize(
+        "title, error",
+        [
+            ("Success", None),
+            ("Error Title", ConnectionError),
+            ("Error Title", ChunkedEncodingError),
+        ],
+    )
+    def test__download(self, title, error, mocker):
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocked__to_filesystem = mocker.patch.object(ebook, "_to_filesystem")
+        mocked_get = mocker.patch.object(ebook, "_get")
+        mocked_get.side_effect = error
+        echo_spy = mocker.spy(click, "echo")
+        if error:
+            ebook._download(title)
+            echo_spy.assert_called_once_with(
+                click.style(
+                    f"Direct Download Not Available from {title}.\n Try Another Download Link",
+                    fg="red",
+                )
+            )
+        else:
+
+            class MockResponse:
+                def __init__(self):
+                    self._status_code = 200
+                    self._content_type = AnnasEbook._EPUB_CONTENT_TYPE
+
+                @property
+                def headers(self):
+                    headers = dict()
+                    headers["Content-Type"] = self._content_type
+                    return headers
+
+                @property
+                def status_code(self):
+                    return self._status_code
+
+            response = MockResponse()
+            mocked_get.return_value = response
+            ebook._download(title)
+            mocked__to_filesystem.assert_called_once_with(response)
+
+    @pytest.mark.parametrize(
         (
             "_selected_result, response_status_code, "
             "error, response_content_type, is_ipfs, "
