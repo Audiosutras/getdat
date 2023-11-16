@@ -1,7 +1,6 @@
 import click
-import webbrowser
 from .utils import AnnasEbook, print_help
-from .constants import EBOOK_ERROR_MSG, MOVIE_WEB
+from .constants import EBOOK_ERROR_MSG, MOVIE_WEB, TOTALSPORTK
 
 
 @click.group(
@@ -13,9 +12,15 @@ def cli():
 
 
 @cli.command()
+def sport():
+    """Launches totalsportk in your default browser"""
+    click.launch(TOTALSPORTK)
+
+
+@cli.command()
 def cinema():
     """Launches movie-web.app in your default browser"""
-    webbrowser.open_new_tab(MOVIE_WEB)
+    click.launch(MOVIE_WEB)
 
 
 @cli.command()
