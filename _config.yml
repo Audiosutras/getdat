@@ -1,0 +1,14 @@
+# GH Pages Config
+lsi: false
+safe: true
+title: Chris Dixon On Code - Documentation & Tutorials
+show_downloads: true
+google_analytics: G-Q4975QX7FH
+incremental: false
+highlighter: rouge
+gist:
+  noscript: false
+markdown: GFM
+remote_theme: pages-themes/midnight@v0.2.0 # https://github.com/pages-themes/midnight
+plugins:
+- jekyll-remote-theme # add this line to the plugins list if you already have one
