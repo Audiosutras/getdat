@@ -1,6 +1,6 @@
 ## Local Development
 
-Python Version: `3.11`. To install python on Unix systems
+Python Version: `3.11`. To install python on MacOS & Debian-based systems
 ```bash
 -> sudo apt install software-properties-common
 -> sudo add-apt-repository ppa:deadsnakes/ppa
