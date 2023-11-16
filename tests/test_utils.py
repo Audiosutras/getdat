@@ -2,7 +2,6 @@ import os
 import click
 import pytest
 import requests
-import webbrowser
 from click.testing import CliRunner
 from requests.exceptions import ConnectionError, ChunkedEncodingError
 from src.getdat.utils import print_help, AnnasEbook
@@ -271,45 +270,26 @@ class TestAnnasEbook:
         assert ebook._get_url(**kwargs) == expected_url
 
     @pytest.mark.parametrize(
-        "msg, error, error_msg, is_download",
+        "msg, error",
         [
-            ("This is a message echoed to user", None, "", False),
-            ("", None, "", False),
+            ("This is a message echoed to user", None),
+            ("", None),
             (
                 "This is a message echoed to user",
                 ConnectionError,
-                "No connection established",
-                False,
             ),
-            ("", ChunkedEncodingError, "No connection established", False),
-            ("", ConnectionError, "No connection established", True),
-            (
-                "This is a message echoed to user",
-                ChunkedEncodingError,
-                "No connection established",
-                True,
-            ),
+            ("", ChunkedEncodingError),
         ],
     )
-    def test__get(self, msg, error, error_msg, is_download, mocker):
+    def test__get(self, msg, error, mocker):
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
         mocked_get = mocker.patch.object(requests, "get")
         mocker.patch.object(ebook, "_msg", msg)
         kwargs = dict()
         spy = mocker.spy(click, "style")
-        if error and not is_download:
+        if error:
             mocked_get.side_effect = error
-            response = ebook._get(**kwargs)
-            spy.assert_has_calls(
-                [
-                    mocker.call(f"\n{msg}", fg="bright_yellow"),
-                    mocker.call("No connection established", fg="bright_red"),
-                ]
-            )
-        elif error and is_download:
-            with pytest.raises(error) as e:
-                mocked_get.side_effect = error
-                kwargs["is_download"] = True
+            with pytest.raises(error):
                 response = ebook._get(**kwargs)
                 spy.assert_has_calls(
                     [
@@ -317,7 +297,6 @@ class TestAnnasEbook:
                         mocker.call("No connection established", fg="bright_red"),
                     ]
                 )
-                assert response == error
         else:
             mocked_get.return_value = "OK"
             response = ebook._get()
@@ -831,6 +810,7 @@ class TestAnnasEbook:
                     return f.read()
 
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        spy_echo = mocker.spy(click, "echo")
         mocker.patch.object(ebook, "_resource_name", _resource_name)
         mocker.patch.object(ebook, "output_dir", output_dir)
         mock_open = mocker.mock_open()
@@ -842,6 +822,7 @@ class TestAnnasEbook:
             mock_open.assert_called_once_with(resource_path, "wb")
         else:
             mock_open.assert_called_once_with(resource_name, "wb")
+        spy_echo.assert_called_once_with("Done 📚 🎆 🎇")
 
     @pytest.mark.parametrize(
         "title, error",
@@ -855,9 +836,9 @@ class TestAnnasEbook:
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
         mocked__to_filesystem = mocker.patch.object(ebook, "_to_filesystem")
         mocked_get = mocker.patch.object(ebook, "_get")
-        mocked_get.side_effect = error
         echo_spy = mocker.spy(click, "echo")
         if error:
+            mocked_get.side_effect = error
             ebook._download(title)
             echo_spy.assert_called_once_with(
                 click.style(
@@ -1065,7 +1046,7 @@ class TestAnnasEbook:
         mocker.patch.object(ebook, "_selected_result", _selected_result)
         msg = f"\nTalking to {title}..."
         mocker.patch.object(ebook, "_msg", msg)
-        launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+        launch_browser = mocker.patch.object(click, "launch")
         echo_spy = mocker.spy(click, "echo")
         echo_calls = [mocker.call(click.style(msg, fg="bright_yellow"))]
 
@@ -1138,15 +1119,13 @@ class TestAnnasEbook:
             if title == AnnasEbook._LIBGEN_LI:
                 link = page_results["61"].get("link")
                 url = AnnasEbook._SOURCE_DICT[AnnasEbook._LIBGEN_LI].get("url")
-                mock_download.assert_called_once_with(
-                    title, is_download=True, link=f"{url}{link}"
-                )
+                mock_download.assert_called_once_with(title, link=f"{url}{link}")
             elif title == AnnasEbook._LIBGEN_RS:
                 mock_download.assert_called_once_with(
-                    title, is_download=True, link=page_results["1"].get("link")
+                    title, link=page_results["1"].get("link")
                 )
         else:
-            launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+            launch_browser = mocker.patch.object(click, "launch")
             mocked_get.return_value = MockResponse(
                 status_code=response_status_code, content_type=response_content_type
             )
@@ -1156,11 +1135,7 @@ class TestAnnasEbook:
 
     @pytest.mark.parametrize(
         "value_1, value_2",
-        [
-            (0, None),
-            (1, 0),
-            # (1, 1)
-        ],
+        [(0, None), (1, 0), (1, 1)],
     )
     def test_run(self, value_1, value_2, mocker):
         selected_result_1 = {
@@ -1176,7 +1151,7 @@ class TestAnnasEbook:
         link_1 = selected_result_1.get("link")
         link_2 = selected_result_2.get("link")
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
-        mocked_launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+        mocked_launch_browser = mocker.patch.object(click, "launch")
         mocked__scrape_page = mocker.patch.object(
             ebook,
             "_scrape_page",
@@ -1186,14 +1161,21 @@ class TestAnnasEbook:
             "_selected_result",
             return_value=[selected_result_1, selected_result_2],
         )
-        mocked__scrape_page.return_value = [value_1, value_2]
-        if value_2 is None:
+        mocked__dl_or_launch_page = mocker.patch.object(ebook, "_dl_or_launch_page")
+        mocked__scrape_page.side_effect = [value_1, value_2]
+        spy_clear = mocker.spy(click, "clear")
+        if value_1 == 0 and value_2 is None:
             ebook.run()
             mocked_launch_browser.assert_called_once()
-        if value_2 == 0:
+            mocked__dl_or_launch_page.assert_not_called()
+            spy_clear.assert_not_called()
+        elif value_1 == 1 and value_2 == 0:
             ebook.run()
             mocked_launch_browser.assert_called_once()
+            mocked__dl_or_launch_page.assert_not_called()
+            spy_clear.assert_called_once()
         else:
-            mocked__dl_or_launch_page = mocker.patch.object(ebook, "_dl_or_launch_page")
             ebook.run()
+            mocked_launch_browser.assert_not_called()
             mocked__dl_or_launch_page.assert_called_once()
+            assert spy_clear.call_count == 2

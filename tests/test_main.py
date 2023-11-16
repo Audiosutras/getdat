@@ -1,18 +1,37 @@
 import pytest
-import webbrowser
+import click
 from unittest.mock import Mock
 from click.testing import CliRunner
 from src import getdat
-from src.getdat.main import cinema, ebook
+from src.getdat.main import cli, sport, cinema, ebook
 from src.getdat.utils import AnnasEbook
-from src.getdat.constants import EBOOK_ERROR_MSG, MOVIE_WEB
+from src.getdat.constants import EBOOK_ERROR_MSG, MOVIE_WEB, TOTALSPORTK
+
+
+class TestCLI:
+    runner = CliRunner()
+
+    def test_getdat_homepage_in_epilog(self):
+        result = self.runner.invoke(cli)
+        homepage = "https://audiosutras.github.io/getdat/"
+        assert homepage in result.output
+
+
+class TestSport:
+    runner = CliRunner()
+
+    def test_sport_launches_browser(self, mocker):
+        browser_launch = mocker.patch.object(click, "launch")
+        result = self.runner.invoke(sport)
+        assert result.exit_code == 0
+        browser_launch.assert_called_once_with(TOTALSPORTK)
 
 
 class TestCinema:
     runner = CliRunner()
 
     def test_cinema_launches_browser(self, mocker):
-        browser_launch = mocker.patch.object(webbrowser, "open_new_tab")
+        browser_launch = mocker.patch.object(click, "launch")
         result = self.runner.invoke(cinema)
         assert result.exit_code == 0
         browser_launch.assert_called_once_with(MOVIE_WEB)
