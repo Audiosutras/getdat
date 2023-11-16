@@ -3,9 +3,18 @@ import webbrowser
 from unittest.mock import Mock
 from click.testing import CliRunner
 from src import getdat
-from src.getdat.main import cinema, ebook
+from src.getdat.main import cli, cinema, ebook
 from src.getdat.utils import AnnasEbook
 from src.getdat.constants import EBOOK_ERROR_MSG, MOVIE_WEB
+
+
+class TestCLI:
+    runner = CliRunner()
+
+    def test_getdat_homepage_in_epilog(self):
+        result = self.runner.invoke(cli)
+        homepage = "https://audiosutras.github.io/getdat/"
+        assert homepage in result.output
 
 
 class TestCinema:
