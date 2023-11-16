@@ -2,7 +2,7 @@
     <h1>GetDat</h1>
     <p><i>A command line utility for getting resources available online</i></p>
     <img
-        src="/docs/static/getdat-logo.png"
+        src="docs/static/getdat-logo.png"
         alt="GetDat Package Logo"
         height="400"
     />
@@ -36,7 +36,7 @@ Launches [movie-web.app](https://movie-web.app/search/movie) in your default bro
 
 <div align="center">
     <img
-        src="/docs/static/getdat-cinema.gif"
+        src="docs/static/getdat-cinema.gif"
         alt="Gif of GetDat Cinema Command In Action"
     />
 </div>
@@ -50,7 +50,7 @@ Search and download an ebook available through [Anna's Archive](https://annas-ar
 
 <div align="center">
     <img
-        src="/docs/static/getdat-ebook.gif"
+        src="docs/static/getdat-ebook.gif"
         alt="Gif of GetDat Cinema Command In Action"
     />
 </div>
@@ -101,4 +101,4 @@ or
 
 ## Additional Sections
 
-#### [Local Development](docs/local_dev.md)
+### [Local Development](docs/local_dev.md)
