@@ -2,9 +2,10 @@
 name = "getdat"
 version = "0.1.0"
 description = "A command line utility for getting resources available online"
-documentation = "https://github.com/Audiosutras/getdat/docs"
+homepage = "https://audiosutras.github.io/getdat/"
+documentation = "https://audiosutras.github.io/getdat/"
 repository = "https://github.com/Audiosutras/getdat"
-keywords = ["cli", "books", "movies", "episodes", "anna's archive", "movie-web"]
+keywords = ["cli", "books", "movies", "episodes", "anna's archive", "movie-web", "web scraper"]
 authors = ["Christopher Dixon <christopher.snipes.dixon@gmail.com>"]
 readme = "READMe.md"
 packages = [{include = "getdat", from = "src"}]
