@@ -1,9 +1,8 @@
 # GH Pages Config
 lsi: false
 safe: true
-title: Chris Dixon On Code - Documentation & Tutorials
+title: GetDat - Python Package
 show_downloads: true
-google_analytics: G-Q4975QX7FH
 incremental: false
 highlighter: rouge
 gist:
