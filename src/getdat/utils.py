@@ -229,6 +229,7 @@ class AnnasEbook:
         else:
             with open(resource_name, "wb") as f:
                 f.write(response.content)
+        click.echo("Done 📚 🎆 🎇")
 
     def _download(self, title, *args, **kwargs):
         try:

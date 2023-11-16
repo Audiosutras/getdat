@@ -811,6 +811,7 @@ class TestAnnasEbook:
                     return f.read()
 
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        spy_echo = mocker.spy(click, "echo")
         mocker.patch.object(ebook, "_resource_name", _resource_name)
         mocker.patch.object(ebook, "output_dir", output_dir)
         mock_open = mocker.mock_open()
@@ -822,6 +823,7 @@ class TestAnnasEbook:
             mock_open.assert_called_once_with(resource_path, "wb")
         else:
             mock_open.assert_called_once_with(resource_name, "wb")
+        spy_echo.assert_called_once_with("Done 📚 🎆 🎇")
 
     @pytest.mark.parametrize(
         "title, error",
