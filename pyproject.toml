@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "getdat"
-version = "0.1.0"
+version = "0.1.1"
 description = "A command line utility for getting resources available online"
 homepage = "https://audiosutras.github.io/getdat/"
 documentation = "https://audiosutras.github.io/getdat/"
@@ -14,7 +14,7 @@ packages = [{include = "getdat", from = "src"}]
 python = "^3.11"
 click = "^8.1.7"
 requests = "^2.31.0"
-bs4 = "^0.0.1"
+beautifulsoup4 = "^4.12.2"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.3"
