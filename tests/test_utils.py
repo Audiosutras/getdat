@@ -1156,11 +1156,7 @@ class TestAnnasEbook:
 
     @pytest.mark.parametrize(
         "value_1, value_2",
-        [
-            (0, None),
-            (1, 0),
-            # (1, 1)
-        ],
+        [(0, None), (1, 0), (1, 1)],
     )
     def test_run(self, value_1, value_2, mocker):
         selected_result_1 = {
@@ -1186,14 +1182,21 @@ class TestAnnasEbook:
             "_selected_result",
             return_value=[selected_result_1, selected_result_2],
         )
-        mocked__scrape_page.return_value = [value_1, value_2]
-        if value_2 is None:
+        mocked__dl_or_launch_page = mocker.patch.object(ebook, "_dl_or_launch_page")
+        mocked__scrape_page.side_effect = [value_1, value_2]
+        spy_clear = mocker.spy(click, "clear")
+        if value_1 == 0 and value_2 is None:
             ebook.run()
             mocked_launch_browser.assert_called_once()
-        if value_2 == 0:
+            mocked__dl_or_launch_page.assert_not_called()
+            spy_clear.assert_not_called()
+        elif value_1 == 1 and value_2 == 0:
             ebook.run()
             mocked_launch_browser.assert_called_once()
+            mocked__dl_or_launch_page.assert_not_called()
+            spy_clear.assert_called_once()
         else:
-            mocked__dl_or_launch_page = mocker.patch.object(ebook, "_dl_or_launch_page")
             ebook.run()
+            mocked_launch_browser.assert_not_called()
             mocked__dl_or_launch_page.assert_called_once()
+            assert spy_clear.call_count == 2

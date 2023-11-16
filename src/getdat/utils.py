@@ -108,11 +108,8 @@ class AnnasEbook:
         try:
             response = requests.get(self._get_url(*args, **kwargs))
         except (ConnectionError, ChunkedEncodingError) as e:
-            is_download = kwargs.pop("is_download", False)
-            if is_download:
-                click.echo(click.style("No connection established", fg="bright_red"))
-                raise e
-            return click.echo(click.style("No connection established", fg="bright_red"))
+            click.echo(click.style("No connection established", fg="bright_red"))
+            raise e
         else:
             return response
 
@@ -205,16 +202,21 @@ class AnnasEbook:
         return have_results
 
     def _scrape_page(self, *args, **kwargs) -> int:
-        response = self._get(*args, **kwargs)
-        results = self._scrape_results(response)
-        have_results = self._echo_results(results)
-        if have_results:
-            value = click.prompt(
-                "Select Number", type=click.IntRange(min=0, max=(len(results) - 1))
-            )
-            self._selected_result = results.get(str(value))
-            selected_link = self._selected_result.get("link")
-            return value
+        try:
+            response = self._get(*args, **kwargs)
+        except (ConnectionError, ChunkedEncodingError):
+            ctx = click.get_current_context()
+            ctx.exit(1)
+        else:
+            results = self._scrape_results(response)
+            have_results = self._echo_results(results)
+            if have_results:
+                value = click.prompt(
+                    "Select Number", type=click.IntRange(min=0, max=(len(results) - 1))
+                )
+                self._selected_result = results.get(str(value))
+                selected_link = self._selected_result.get("link")
+                return value
 
     def _to_filesystem(self, response: Response):
         resource_name = self._resource_name.split(", ", 3)[-1]
@@ -293,6 +295,7 @@ class AnnasEbook:
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return webbrowser.open_new_tab(self._selected_result.get("link"))
+        click.clear()
         self._resource_name = self._selected_result.get("title")
         click.echo("")
         click.echo("")
@@ -307,5 +310,6 @@ class AnnasEbook:
         value = self._scrape_page(*args, **kwargs)
         if value == 0:
             return webbrowser.open_new_tab(self._selected_result.get("link"))
+        click.clear()
         self._scrape_key = ""
         self._dl_or_launch_page(*args, **kwargs)
