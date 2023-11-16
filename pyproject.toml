@@ -1,9 +1,8 @@
 [tool.poetry]
 name = "getdat"
-version = "0.1.1"
+version = "0.1.2"
 description = "A command line utility for getting resources available online"
 homepage = "https://audiosutras.github.io/getdat/"
-documentation = "https://audiosutras.github.io/getdat/"
 repository = "https://github.com/Audiosutras/getdat"
 keywords = ["cli", "books", "movies", "episodes", "anna's archive", "movie-web", "web scraper"]
 authors = ["Christopher Dixon <christopher.snipes.dixon@gmail.com>"]

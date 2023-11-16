@@ -20,15 +20,18 @@ Table of Contents
 - [Installation Methods](#installation-methods)
 - [Commands](#commands)
 - [Local Development](#local-development)
+- [Deployment - Publishing GetDat](#deployment---publishing-getdat)
 - [Contributors](#contributors)
 
 ## Installation Methods
 
-Install using `pipx`:
-
+PYPI - Stable Release:
 ```bash
--> python3 -m pip install --user pipx
--> python3 -m pipx ensurepath
+-> pipx install getdat
+```
+
+From Head commit of Repository:
+```bash
 -> pipx install git+https://github.com/Audiosutras/getdat.git
 ```
 
@@ -161,7 +164,7 @@ Style guide and code check enforced with [pre-commit](https://pre-commit.com/)
 (getdat-py3.11) -> pre-commit install
 ```
 
-## Publishing Package
+## Deployment - Publishing Getdat
 
 Workflow: `master` branch
 
@@ -169,7 +172,16 @@ Workflow: `master` branch
 
 2. Create a [git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging) with the new version number `*.*.*` you specified in `pyproject.toml`.
 
-3. Push the newly created tag `git push origin *.*.*` to the repository. This will trigger the `pre-release.yml` github workflow to publish our package to `test.pypi`.
+3. Push the newly created tag `git push origin *.*.*` to the repository. This will trigger the `pre-release.yml` github workflow to publish our package to `test.pypi`. The pre-release can be seen [here](https://test.pypi.org/project/getdat/) for testing. Install with:
+```bash
+-> python3.11 -m pip install --index-url https://test.pypi.org/simple/ getdat --extra-index-url https://pypi.org/simple beautifulsoup4 requests click
+```
+- *Note*: `--extra-index-url` option is pulling dependencies from `pypi.org` and not `test.pypi.org` though our package is coming in from `test.pypi.org`. Make sure to add all dependencies from `[tool.poetry.dependencies]` in `pyproject.toml` (except python) before running this command.
+
+4. *Create* a [release](https://www.toolsqa.com/git/github-releases/) on github. Make sure to select `Tags` from the toggle menu. Select the latest tag (highest version number). Name the release `Release *.*.*`. Make sure the version number in `pyproject.toml` syncs up with the release version. *Click* `Publish release`. This will kick off our `release.yml` workflow to publish our package to `pypi`. The release can be seen [here and installed](https://pypi.org/project/getdat/) for production use. Install with:
+```bash
+-> pipx install getdat
+```
 
 ## Contributors
 
