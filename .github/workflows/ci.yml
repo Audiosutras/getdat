@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   run_test_suite:
-    name: Run Test Suite
+    name: Run Test Suite, Style Guide, & Code Checks
     runs-on: ubuntu-latest
     strategy:
       matrix:
