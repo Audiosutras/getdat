@@ -1,1 +1,1 @@
-# [GetDat Documentation](docs/index.md)
+ ![GetDat Documentation](docs/index.md)
