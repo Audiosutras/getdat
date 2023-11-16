@@ -1153,3 +1153,47 @@ class TestAnnasEbook:
             ebook._dl_or_launch_page()
             link = ebook._determine_link()
             launch_browser.assert_called_once_with(link)
+
+    @pytest.mark.parametrize(
+        "value_1, value_2",
+        [
+            (0, None),
+            (1, 0),
+            # (1, 1)
+        ],
+    )
+    def test_run(self, value_1, value_2, mocker):
+        selected_result_1 = {
+            "title": "Z-Library",
+            "link": "https://1lib.sk/md5/4f95158d79dae74e16b5d0567be36fa6",
+            "value": 7,
+        }
+        selected_result_2 = {
+            "title": "IPFS Gateway #1",
+            "link": "https://cloudflare-ipfs/ipfs/md5=4f95158d79dae74e16b5d0567be36fa6",
+            "value": 6,
+        }
+        link_1 = selected_result_1.get("link")
+        link_2 = selected_result_2.get("link")
+        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+        mocked_launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+        mocked__scrape_page = mocker.patch.object(
+            ebook,
+            "_scrape_page",
+        )
+        mocker.patch.object(
+            ebook,
+            "_selected_result",
+            return_value=[selected_result_1, selected_result_2],
+        )
+        mocked__scrape_page.return_value = [value_1, value_2]
+        if value_2 is None:
+            ebook.run()
+            mocked_launch_browser.assert_called_once()
+        if value_2 == 0:
+            ebook.run()
+            mocked_launch_browser.assert_called_once()
+        else:
+            mocked__dl_or_launch_page = mocker.patch.object(ebook, "_dl_or_launch_page")
+            ebook.run()
+            mocked__dl_or_launch_page.assert_called_once()
