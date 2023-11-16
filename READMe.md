@@ -13,7 +13,7 @@
     </p>
 </div>
 
-![Tests](https://github.com/Audiosutras/getdat/actions/workflows/ci.yml/badge.svg?branch=master)
+![CI](https://github.com/Audiosutras/getdat/actions/workflows/ci.yml/badge.svg?branch=master)
 
 ## Installation Methods
 
