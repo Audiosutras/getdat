@@ -15,9 +15,9 @@
 
 ![Tests](https://github.com/Audiosutras/getdat/actions/workflows/tests.yml/badge.svg?branch=master)
 
-## Installation
+## Installation Methods
 
-Once Unit Testing for the `ebook` command is complete this package will be made available on pypi.org. Currently install using `pipx`:
+Install using `pipx`:
 
 ```bash
 -> python3 -m pip install --user pipx
@@ -98,9 +98,6 @@ or
 #### Environment Variable
 
 - `GETDAT_BOOK_DIR` - See [Options](#options) `--output_dir` for more information
-
-#### Notes
-* Tests are a work in progress for this command
 
 ## Local Development
 
