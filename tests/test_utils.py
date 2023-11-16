@@ -2,7 +2,6 @@ import os
 import click
 import pytest
 import requests
-import webbrowser
 from click.testing import CliRunner
 from requests.exceptions import ConnectionError, ChunkedEncodingError
 from src.getdat.utils import print_help, AnnasEbook
@@ -1047,7 +1046,7 @@ class TestAnnasEbook:
         mocker.patch.object(ebook, "_selected_result", _selected_result)
         msg = f"\nTalking to {title}..."
         mocker.patch.object(ebook, "_msg", msg)
-        launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+        launch_browser = mocker.patch.object(click, "launch")
         echo_spy = mocker.spy(click, "echo")
         echo_calls = [mocker.call(click.style(msg, fg="bright_yellow"))]
 
@@ -1126,7 +1125,7 @@ class TestAnnasEbook:
                     title, link=page_results["1"].get("link")
                 )
         else:
-            launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+            launch_browser = mocker.patch.object(click, "launch")
             mocked_get.return_value = MockResponse(
                 status_code=response_status_code, content_type=response_content_type
             )
@@ -1152,7 +1151,7 @@ class TestAnnasEbook:
         link_1 = selected_result_1.get("link")
         link_2 = selected_result_2.get("link")
         ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
-        mocked_launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
+        mocked_launch_browser = mocker.patch.object(click, "launch")
         mocked__scrape_page = mocker.patch.object(
             ebook,
             "_scrape_page",
