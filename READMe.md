@@ -15,6 +15,13 @@
 
 ![CI](https://github.com/Audiosutras/getdat/actions/workflows/ci.yml/badge.svg?branch=master)
 
+Table of Contents
+
+- [Installation Methods](#installation-methods)
+- [Commands](#commands)
+- [Local Development](#local-development)
+- [Contributors](#contributors)
+
 ## Installation Methods
 
 Install using `pipx`:
@@ -31,7 +38,7 @@ Install using `pipx`:
 
 #### [Ebook](#ebook)
 
-## Cinema
+### Cinema
 Launches [movie-web.app](https://movie-web.app/search/movie) in your default browser
 
 <div align="center">
@@ -45,7 +52,7 @@ Launches [movie-web.app](https://movie-web.app/search/movie) in your default bro
 -> getdat cinema
 ```
 
-## Ebook
+### Ebook
 Search and download an ebook available through [Anna's Archive](https://annas-archive.org/). You can think of this command as "headless" Anna's Archive
 
 <div align="center">
@@ -153,6 +160,16 @@ Style guide and code check enforced with [pre-commit](https://pre-commit.com/)
 ```
 (getdat-py3.11) -> pre-commit install
 ```
+
+## Publishing Package
+
+Workflow: `master` branch
+
+1. In `pyproject.toml` *bump* the version number `*.*.*`
+
+2. Create a [git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging) with the new version number `*.*.*` you specified in `pyproject.toml`.
+
+3. Push the newly created tag `git push origin *.*.*` to the repository. This will trigger the `pre-release.yml` github workflow to publish our package to `test.pypi`.
 
 ## Contributors
 
