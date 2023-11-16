@@ -247,7 +247,7 @@ class AnnasEbook:
         title = self._selected_result.get("title")
         link = self._determine_link()
         self._msg = f"Talking to {title}..."
-        kwargs["is_download"] = True
+
         try:
             response = self._get(*args, **kwargs)
         except (ConnectionError, ChunkedEncodingError):

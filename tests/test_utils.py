@@ -1118,12 +1118,10 @@ class TestAnnasEbook:
             if title == AnnasEbook._LIBGEN_LI:
                 link = page_results["61"].get("link")
                 url = AnnasEbook._SOURCE_DICT[AnnasEbook._LIBGEN_LI].get("url")
-                mock_download.assert_called_once_with(
-                    title, is_download=True, link=f"{url}{link}"
-                )
+                mock_download.assert_called_once_with(title, link=f"{url}{link}")
             elif title == AnnasEbook._LIBGEN_RS:
                 mock_download.assert_called_once_with(
-                    title, is_download=True, link=page_results["1"].get("link")
+                    title, link=page_results["1"].get("link")
                 )
         else:
             launch_browser = mocker.patch.object(webbrowser, "open_new_tab")
