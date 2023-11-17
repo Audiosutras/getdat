@@ -63,6 +63,9 @@ hr {
     .language-plaintext {
         color: #c4b5fd !important;
     }
+    div[class^=language], pre.highlight {
+        border-color: #7e22ce;
+    }
     .highlighter-rouge {
         margin: 1rem 0rem;
         .na {
@@ -71,7 +74,7 @@ hr {
         .pi {
             color: #fde047;
         }
-        .s {
+        .s, .s2 {
             color: #22d3ee;
         }
         .m {
@@ -86,9 +89,10 @@ hr {
     }
     .gif-image {
         width: 100% !important;
-        border-color: green;
-        border-width: 2px;
+        border-color: #7e22ce;
+        border-width: 1px;
         border-radius: 5px;
+        padding: 1rem 0rem;
         img {
             object-fit: contain !important;
         }
