@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    {% include head-custom.html %}
+    <!-- Add Tailwind CSS-->
+    <script src="https://cdn.tailwindcss.com"></script>
+{% seo %}
+  </head>
+
+  <body class="bg-black flex min-h-screen flex-col justify-between sm:px-8 md:px-24">
+    <header>
+      <div class="border-b-4 border-purple-500">
+          <div class="pt-2 flex flex-row justify-center items-center">
+              <a href="https://chrisdixononcode.dev">
+              <img
+                  src="https://d2ixboot0418ao.cloudfront.net/logoSymbol.svg"
+                  width="250"
+                  height="250"
+                  alt="Chris Dixon on Code logo"
+              />
+              </a>
+          </div>
+          <div class="flex flex-row justify-center px-4 pb-4">
+              <p>
+                  The personal website of Christopher Dixon to share
+                  thoughts on code and otherwise
+              </p>
+          </div>
+      </div>
+      <nav class="border-b-4 border-amber-500 pt-4 px-4 pb-6 text-xl">
+          <div
+              class="flex flex-row justify-center md:justify-between flex-wrap"
+          >
+              <div class="my-4">
+                  <div class="px-2">
+                      <span class="relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                      </span>
+                      <a href="https://chrisdixononcode.dev" class="border border-green-300 bg-black rounded p-2">
+                          <span class="text-green-200 text-xl font-bold">Home</span>
+                      </a>
+                  </div>
+              </div>
+              <div class="flex flex-row justify-between my-4">
+                <div class="px-2">
+                  <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                  </span>
+                  <a href="/" class="border border-yellow-300 bg-black rounded p-2">
+                      <span class="text-yellow-300 text-xl font-bold">Docs</span>
+                  </a>
+                </div>
+                <div class="px-2">
+                  <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                  </span>
+                  <a href="https://chrisdixononcode.dev/thoughts" class="border border-teal-300 bg-black rounded p-2">
+                      <span class="text-teal-300 text-xl font-bold">Thoughts</span>
+                  </a>
+                </div>
+                <div class="px-2">
+                  <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                  </span>
+                  <a href="https://chrisdixononcode.dev/tv" class="border border-red-500 bg-black rounded p-2">
+                      <span class="text-red-500 text-xl font-bold">TV</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+      </nav>
+    </header>
+
+    <div>
+      <section id="main_content">
+        {{ content }}
+      </section>
+    </div>
+    <footer class="pb-12 pt-6 mt-12 border-t-4 border-purple-500">
+        <div>
+            <div class="flex flex-row flex-wrap justify-center sm:justify-end mb-4 item-center">
+              <div class="px-2">
+                  <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                  </span>
+                  <a href="https://chrisdixononcode.dev" class="border border-green-300 bg-black rounded p-2">
+                      <span class="text-green-200 text-xl font-bold">Home</span>
+                  </a>
+              </div>
+              <div class="px-2">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                </span>
+                <a href="/" class="border border-yellow-300 bg-black rounded p-2">
+                    <span class="text-yellow-300 text-xl font-bold">Docs</span>
+                </a>
+              </div>
+              <div class="px-2">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                </span>
+                <a href="https://chrisdixononcode.dev/thoughts" class="border border-teal-300 bg-black rounded p-2">
+                    <span class="text-teal-300 text-xl font-bold">Thoughts</span>
+                </a>
+              </div>
+              <div class="px-2">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                </span>
+                <a href="https://chrisdixononcode.dev/tv" class="border border-red-500 bg-black rounded p-2">
+                    <span class="text-red-500 text-xl font-bold">TV</span>
+                </a>
+              </div>
+              <div class="px-2">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3"></span>
+                </span>
+                <a href="https://chrisdixononcode.dev/support" class="border border-slate-300 bg-black rounded p-2">
+                    <span class="text-slate-200 text-xl font-bold">Support</span>
+                </a>
+              </div>
+            </div>
+        </div>
+        <div class="flex flex-row flex-wrap items-center justify-center py-4">
+            <div>
+                <p>Tech used in building this site:</p>
+            </div>
+            <div class="py-4 px-8 flex flex-row justify-between items-center">
+            <p class="px-4">Next.js</p>
+                <img
+                    class="bg-white"
+                    src="https://d2ixboot0418ao.cloudfront.net/nextjsLogo.svg"
+                    width="50"
+                    height="50"
+                    alt="Next.js logo"
+                />
+            </div>
+            <div class="py-4 px-8 flex flex-row justify-between items-center">
+            <p class="px-4">Typescript</p>
+                <img
+                    src="https://d2ixboot0418ao.cloudfront.net/typescriptLogo.svg"
+                    width="50"
+                    height="50"
+
+                    alt="Typescript logo"
+                />
+            </div>
+        </div>
+      </footer>
+  </body>
+</html>

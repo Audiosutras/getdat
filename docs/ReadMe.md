@@ -2,7 +2,7 @@
     <h1>GetDat</h1>
     <p><i>A command line utility for getting resources available online</i></p>
     <img
-        src="docs/static/getdat-logo.png"
+        src="{{ 'assets/images/getdat-logo.png' }}"
         alt="GetDat Package Logo"
         height="400"
     />
@@ -44,9 +44,9 @@ From Head commit of Repository:
 ### Cinema
 Launches [movie-web.app](https://movie-web.app/search/movie) in your default browser
 
-<div align="center">
+<div align="center" class="gif-image">
     <img
-        src="docs/static/getdat-cinema.gif"
+        src="{{ 'assets/images/getdat-cinema.gif' | relative_url }}"
         alt="Gif of GetDat Cinema Command In Action"
     />
 </div>
@@ -58,10 +58,11 @@ Launches [movie-web.app](https://movie-web.app/search/movie) in your default bro
 ### Ebook
 Search and download an ebook available through [Anna's Archive](https://annas-archive.org/). You can think of this command as "headless" Anna's Archive
 
-<div align="center">
+<div align="center" class="gif-image">
     <img
-        src="docs/static/getdat-ebook.gif"
-        alt="Gif of GetDat Cinema Command In Action"
+        src="{{ 'assets/images/getdat-ebook.gif' | relative_url }}"
+        alt="Gif of GetDat Ebook Command In Action"
+        style="border: red"
     />
 </div>
 
@@ -92,9 +93,9 @@ or
 #### OPTIONS
 
 | Name | Convention 1 | Convention 2 | Type | Help |
-| ---- | ------------ | ------------ | ----| ----|
+| ---- | ------------ | ------------ | ---- | ---- |
 | Output Directory | -o | --output_dir | Text | Path to ebook's output directory from home directory. Path must be prefixed by `~` on Unix or `~user` on Windows. This argument overrides `GETDAT_BOOK_DIR` env var if set. Outputs book to working directory if neither are set.
-| Extension | -e | --ext | [epub | pdf] | Preferred ebook extension for search results
+| Extension | -e | --ext | [epub{%raw%}|{%endraw%}pdf] | Preferred ebook extension for search results
 
 Example:
 ```bash

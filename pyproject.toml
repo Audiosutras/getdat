@@ -6,7 +6,7 @@ homepage = "https://audiosutras.github.io/getdat/"
 repository = "https://github.com/Audiosutras/getdat"
 keywords = ["cli", "books", "movies", "episodes", "anna's archive", "movie-web", "web scraper"]
 authors = ["Christopher Dixon <christopher.snipes.dixon@gmail.com>"]
-readme = "READMe.md"
+readme = "docs/ReadMe.md"
 packages = [{include = "getdat", from = "src"}]
 
 [tool.poetry.dependencies]
