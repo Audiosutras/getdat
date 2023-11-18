@@ -784,21 +784,37 @@ class TestAnnasEbook:
         assert ebook._selected_result == expected_selected_result
 
     @pytest.mark.parametrize(
-        "_resource_name, html_file_path, output_dir",
+        "_resource_name, html_file_path, output_dir, error",
         [
             (
                 "English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub",
                 "tests/static/annas_archive_detail.html",
                 "~/books/epub/dir",
+                None,
+            ),
+            (
+                "English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub",
+                "tests/static/annas_archive_detail.html",
+                "~/books/epub/dir",
+                FileNotFoundError,
             ),
             (
                 "English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub",
                 "tests/static/annas_archive_detail.html",
                 "",
+                None,
+            ),
+            (
+                "English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub",
+                "tests/static/annas_archive_detail.html",
+                "",
+                FileNotFoundError,
             ),
         ],
     )
-    def test__to_filesystem(self, _resource_name, html_file_path, output_dir, mocker):
+    def test__to_filesystem(
+        self, _resource_name, html_file_path, output_dir, error, mocker
+    ):
         class MockResponse:
             @property
             def url(self):
@@ -815,14 +831,44 @@ class TestAnnasEbook:
         mocker.patch.object(ebook, "output_dir", output_dir)
         mock_open = mocker.mock_open()
         mocker.patch("src.getdat.utils.open", mock_open)
-        ebook._to_filesystem(response=MockResponse())
+        error_msg = "Error found here"
+        if error:
+            mock_open.side_effect = error(error_msg)
+            ebook._to_filesystem(response=MockResponse())
+        else:
+            ebook._to_filesystem(response=MockResponse())
         resource_name = _resource_name.split(", ", 3)[-1]
         if output_dir:
             resource_path = os.path.join(os.path.expanduser(output_dir), resource_name)
             mock_open.assert_called_once_with(resource_path, "wb")
+            if error:
+                spy_echo.assert_has_calls(
+                    [
+                        mocker.call(
+                            click.style("Download Unsuccessful", fg="bright_red")
+                        ),
+                        mocker.call(click.style(f"{error_msg}", fg="bright_red")),
+                    ]
+                )
+            else:
+                spy_echo.assert_has_calls(
+                    [mocker.call("Done 📚 🎆 🎇"), mocker.call(resource_path)]
+                )
         else:
             mock_open.assert_called_once_with(resource_name, "wb")
-        spy_echo.assert_called_once_with("Done 📚 🎆 🎇")
+            if error:
+                spy_echo.assert_has_calls(
+                    [
+                        mocker.call(
+                            click.style("Download Unsuccessful", fg="bright_red")
+                        ),
+                        mocker.call(click.style(f"{error_msg}", fg="bright_red")),
+                    ]
+                )
+            else:
+                spy_echo.assert_has_calls(
+                    [mocker.call("Done 📚 🎆 🎇"), mocker.call(resource_name)]
+                )
 
     @pytest.mark.parametrize(
         "title, error",
