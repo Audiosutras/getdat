@@ -218,17 +218,34 @@ class AnnasEbook:
                 return value
 
     def _to_filesystem(self, response: Response):
+        """Write file to filesystem if it does not already exists
+
+        Throws a FileNotFoundError if self.output_dir is not valid
+        """
         resource_name = self._resource_name.split(", ", 3)[-1]
         if self.output_dir:
             resource_path = os.path.join(
                 os.path.expanduser(self.output_dir), resource_name
             )
-            with open(resource_path, "wb") as f:
-                f.write(response.content)
+            try:
+                with open(resource_path, "wb") as f:
+                    f.write(response.content)
+            except FileNotFoundError as e:
+                click.echo(click.style("Download Unsuccessful", fg="bright_red"))
+                click.echo(click.style(f"{e}", fg="bright_red"))
+            else:
+                click.echo("Done 📚 🎆 🎇")
+                click.echo(resource_path)
         else:
-            with open(resource_name, "wb") as f:
-                f.write(response.content)
-        click.echo("Done 📚 🎆 🎇")
+            try:
+                with open(resource_name, "wb") as f:
+                    f.write(response.content)
+            except FileNotFoundError as e:
+                click.echo(click.style("Download Unsuccessful", fg="bright_red"))
+                click.echo(click.style(f"{e}", fg="bright_red"))
+            else:
+                click.echo("Done 📚 🎆 🎇")
+                click.echo(resource_name)
 
     def _download(self, title, *args, **kwargs):
         try:
