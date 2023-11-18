@@ -1,7 +1,7 @@
 # GH Pages Config
 lsi: false
 safe: true
-title: "GetDat | Chris Dixon On Code"
+title: GetDat | Chris Dixon On Code
 show_downloads: true
 incremental: false
 highlighter: rouge
