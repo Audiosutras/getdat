@@ -13,7 +13,7 @@
     </p>
 </div>
 
-<div class="flex flex-row justify-around flex-wrap">
+<div class="flex flex-row justify-between flex-wrap">
   <a href="https://pypi.org/project/getdat/" alt="Link to PyPi package homepage">
     <img class="p-2" alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/getdat?logo=pypi">
   </a>
