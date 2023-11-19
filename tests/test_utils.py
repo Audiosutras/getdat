@@ -83,13 +83,33 @@ class TestAnnasEbook:
         ebook.ext = expected_ext
 
     @pytest.mark.parametrize(
-        "source, expected_dict",
+        "instance",
+        [
+            (AnnasEbook._ANNAS_ORG_URL),
+            (AnnasEbook._ANNAS_GS_URL),
+            (AnnasEbook._ANNAS_SE_URL),
+            (""),
+        ],
+    )
+    def test_instance(self, instance):
+        if instance:
+            ebook = AnnasEbook(
+                q=self.q, ext=self.ext, output_dir=self.output_dir, instance=instance
+            )
+            assert ebook.instance == instance
+        else:
+            ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+            assert ebook.instance == AnnasEbook._ANNAS_ORG_URL
+
+    @pytest.mark.parametrize(
+        "source, instance, expected_dict",
         [
             (
                 AnnasEbook._SOURCE_ANNAS,
+                "",
                 {
                     "name": AnnasEbook._SOURCE_ANNAS,
-                    "url": "https://annas-archive.org",
+                    "url": AnnasEbook._ANNAS_URLS.get(AnnasEbook._ANNAS_ORG_URL),
                     "search_page_scrape": {
                         "tag": "a",
                         "class": (
@@ -108,18 +128,74 @@ class TestAnnasEbook:
                     "detail_page_scrape": {"tag": "a", "class": "js-download-link"},
                 },
             ),
-            (AnnasEbook._LIBGEN_RS, {"download_page_scrape": {"tag": "a"}}),
+            (
+                AnnasEbook._SOURCE_ANNAS,
+                AnnasEbook._ANNAS_GS_URL,
+                {
+                    "name": AnnasEbook._SOURCE_ANNAS,
+                    "url": AnnasEbook._ANNAS_URLS.get(AnnasEbook._ANNAS_GS_URL),
+                    "search_page_scrape": {
+                        "tag": "a",
+                        "class": (
+                            "js-vim-focus custom-a flex items-center "
+                            "relative left-[-10px] w-[calc(100%+20px)] px-[10px] "
+                            "outline-offset-[-2px] outline-2 rounded-[3px] hover:bg-[#00000011] "
+                            "focus:outline"
+                        ),
+                        "title_container": {
+                            "tag": "div",
+                            "class": (
+                                "line-clamp-[2] leading-[1.2] text-[10px] lg:text-xs text-gray-500"
+                            ),
+                        },
+                    },
+                    "detail_page_scrape": {"tag": "a", "class": "js-download-link"},
+                },
+            ),
+            (
+                AnnasEbook._SOURCE_ANNAS,
+                AnnasEbook._ANNAS_SE_URL,
+                {
+                    "name": AnnasEbook._SOURCE_ANNAS,
+                    "url": AnnasEbook._ANNAS_URLS.get(AnnasEbook._ANNAS_SE_URL),
+                    "search_page_scrape": {
+                        "tag": "a",
+                        "class": (
+                            "js-vim-focus custom-a flex items-center "
+                            "relative left-[-10px] w-[calc(100%+20px)] px-[10px] "
+                            "outline-offset-[-2px] outline-2 rounded-[3px] hover:bg-[#00000011] "
+                            "focus:outline"
+                        ),
+                        "title_container": {
+                            "tag": "div",
+                            "class": (
+                                "line-clamp-[2] leading-[1.2] text-[10px] lg:text-xs text-gray-500"
+                            ),
+                        },
+                    },
+                    "detail_page_scrape": {"tag": "a", "class": "js-download-link"},
+                },
+            ),
+            (AnnasEbook._LIBGEN_RS, "", {"download_page_scrape": {"tag": "a"}}),
             (
                 AnnasEbook._LIBGEN_LI,
+                AnnasEbook._ANNAS_GS_URL,
                 {"url": "https://libgen.li/", "download_page_scrape": {"tag": "a"}},
             ),
-            ("Not part of _SOURCE_DICT", None),
+            ("Not part of _SOURCE_DICT", "", None),
         ],
     )
-    def test_determine_source(self, source, expected_dict, mocker):
-        ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
-        mocker.patch.object(ebook, "_current_source", source)
-        assert ebook._determine_source() == expected_dict
+    def test_determine_source(self, source, instance, expected_dict, mocker):
+        if instance:
+            ebook = AnnasEbook(
+                q=self.q, ext=self.ext, output_dir=self.output_dir, instance=instance
+            )
+            mocker.patch.object(ebook, "_current_source", source)
+            assert ebook._determine_source() == expected_dict
+        else:
+            ebook = AnnasEbook(q=self.q, ext=self.ext, output_dir=self.output_dir)
+            mocker.patch.object(ebook, "_current_source", source)
+            assert ebook._determine_source() == expected_dict
 
     @pytest.mark.parametrize(
         "selected_result, expected_link",
