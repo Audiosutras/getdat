@@ -1,6 +1,7 @@
 import click
 import os
 import requests
+from typing import Literal
 from requests.exceptions import ConnectionError, ChunkedEncodingError
 from requests.models import Response
 from bs4 import BeautifulSoup
@@ -36,10 +37,19 @@ class AnnasEbook:
 
     _SOURCE_ANNAS = "Anna's Archive"
 
+    _ANNAS_ORG_URL = "org"
+    _ANNAS_GS_URL = "gs"
+    _ANNAS_SE_URL = "se"
+    _ANNAS_URLS = {
+        _ANNAS_ORG_URL: "https://annas-archive.org",
+        _ANNAS_GS_URL: "https://annas-archive.gs",
+        _ANNAS_SE_URL: "https://annas-archive.se",
+    }
+
     _SOURCE_DICT = {
         _SOURCE_ANNAS: {
             "name": _SOURCE_ANNAS,
-            "url": "https://annas-archive.org",
+            "url": _ANNAS_URLS.get(_ANNAS_ORG_URL),
             "search_page_scrape": {
                 "tag": "a",
                 "class": (
@@ -67,13 +77,24 @@ class AnnasEbook:
     _msg = "Searching Anna's Archive..."
     _resource_name = ""
 
-    def __init__(self, q: tuple, ext: str, output_dir: str):
+    def __init__(
+        self,
+        q: tuple,
+        ext: str,
+        output_dir: str,
+        instance: Literal[*_ANNAS_URLS.keys()] = _ANNAS_ORG_URL,
+    ):
         self.q = " ".join(map(str, q))
         self.output_dir = output_dir or os.environ.get("GETDAT_BOOK_DIR")
         self.ext = ext
+        self.instance = instance
 
     def _determine_source(self) -> dict:
-        return self._SOURCE_DICT.get(self._current_source)
+        source = self._SOURCE_DICT.get(self._current_source)
+        if self._current_source == self._SOURCE_ANNAS:
+            annas_url = self._ANNAS_URLS.get(self.instance)
+            source.update({"url": annas_url})
+        return source
 
     def _determine_link(self) -> str:
         source = self._determine_source()

@@ -39,15 +39,27 @@ def cinema():
     "--ext",
     type=click.Choice(["epub", "pdf"]),
     default="epub",
-    help="Preferred ebook extension for search results",
+    help=("Preferred ebook extension for search results " "- Default: epub"),
+)
+@click.option(
+    "-i",
+    "--instance",
+    type=click.Choice(AnnasEbook._ANNAS_URLS.keys()),
+    default=AnnasEbook._ANNAS_ORG_URL,
+    help=(
+        "The instance of Anna's Archive you would like to "
+        "use for your search:\n "
+        f"{', '.join(AnnasEbook._ANNAS_URLS.values())}\n"
+        f"- Default: {AnnasEbook._ANNAS_ORG_URL}"
+    ),
 )
 @click.argument("q", nargs=-1)
-def ebook(q, ext, output_dir):
+def ebook(q, ext, output_dir, instance):
     """Search and download an ebook available through Anna's Archive
 
     ex: getdat ebook <Search>
     """
     if not q:
         print_help(EBOOK_ERROR_MSG)
-    ebook = AnnasEbook(q=q, ext=ext, output_dir=output_dir)
+    ebook = AnnasEbook(q=q, ext=ext, output_dir=output_dir, instance=instance)
     ebook.run()

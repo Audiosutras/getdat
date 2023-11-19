@@ -97,22 +97,32 @@ Usage: getdat ebook [OPTIONS] [Q]...
   ex: getdat ebook <Search>
 
 Options:
-  -o, --output_dir TEXT  Path to ebook's output directory from home directory.
-                         Path must be prefixed by '~' on Unix or '~user' on
-                         Windows. This argument overrides GETDAT_BOOK_DIR env
-                         var if set. Outputs book to working directory if
-                         neither are set.
-  -e, --ext [epub|pdf]   Preferred ebook extension for search results
-  --help                 Show this message and exit.
+  -o, --output_dir TEXT       Path to ebook's output directory from home
+                              directory. Path must be prefixed by '~' on Unix
+                              or '~user' on Windows. This argument overrides
+                              GETDAT_BOOK_DIR env var if set. Outputs book to
+                              working directory if neither are set.
+  -e, --ext [epub|pdf]        Preferred ebook extension for search results -
+                              Default: epub
+  -i, --instance [org|gs|se]  The instance of Anna's Archive you would like to
+                              use for your search:  https://annas-archive.org,
+                              https://annas-archive.gs, https://annas-
+                              archive.se - Default: org
+  --help                      Show this message and exit.
+
 ```
 
 Example:
 ```bash
--> getdat ebook Treasure Island Stevenson --ext=epub --output_dir=~/books/epub/
+-> getdat ebook Treasure Island Stevenson --ext=epub --output_dir=~/books/epub/ --instance=gs
 ```
 or
 ```bash
--> getdat ebook "Treasure Island Stevensonn" -e epub -o ~/books/epub
+-> getdat ebook "Treasure Island Stevenson" -e epub -o ~/books/epub -i gs
+```
+or
+```bash
+-> getdat ebook "Treasure Island Stevenson"
 ```
 
 #### Environment Variable
