@@ -4,7 +4,7 @@ from .constants import EBOOK_ERROR_MSG, MOVIE_WEB, TOTALSPORTK
 
 
 @click.group(
-    epilog="Check out our docs at https://audiosutras.github.io/getdat/ for more details"
+    epilog="Check out our docs at https://getdat.chrisdixononcode.dev for help and contributing."
 )
 def cli():
     """A command line utility for getting resources available online"""

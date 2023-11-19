@@ -13,7 +13,7 @@ class TestCLI:
 
     def test_getdat_homepage_in_epilog(self):
         result = self.runner.invoke(cli)
-        homepage = "https://audiosutras.github.io/getdat/"
+        homepage = "https://getdat.chrisdixononcode.dev"
         assert homepage in result.output
 
 
