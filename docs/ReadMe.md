@@ -212,7 +212,7 @@ Workflow: `master` branch
 
 - Push the newly created tag `git push origin *.*.*` to the repository. This will trigger the `pre-release.yml` github workflow to publish our package to `test.pypi`. The pre-release can be seen [here](https://test.pypi.org/project/getdat/) for testing. Install with:
 ```bash
--> python3.11 -m pip install --index-url https://test.pypi.org/simple/ getdat --extra-index-url https://pypi.org/simple beautifulsoup4 requests click
+-> python3.11 -m pip install --index-url https://test.pypi.org/simple/ getdat --extra-index-url https://pypi.org/simple beautifulsoup4 requests click tqdm
 ```
     - *Note*: `--extra-index-url` option is pulling dependencies from `pypi.org` and not `test.pypi.org` though our package is coming in from `test.pypi.org`. Make sure to add all dependencies from `[tool.poetry.dependencies]` in `pyproject.toml` (except python) before running this command.
 
