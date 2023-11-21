@@ -30,9 +30,7 @@ class AnnasEbook:
     )
     _MEMBER_LOGIN_REQUIRED = (_FAST_PARTNER_SERVER, _INTERNET_ARCHIVE, _Z_LIBRARY)
     _HTML_CONTENT_TYPE = "text/html"
-    _PDF_CONTENT_TYPE = "application/pdf"
-    _EPUB_CONTENT_TYPE = "application/epub+zip"
-    _EXPECTED_DL_CONTENT_TYPES = (_PDF_CONTENT_TYPE, _EPUB_CONTENT_TYPE)
+
     _IPFS_URI = "ipfs"
 
     _SOURCE_ANNAS = "Anna's Archive"
@@ -299,7 +297,7 @@ class AnnasEbook:
                     )
                 )
             content_type = response.headers.get("Content-Type")
-            if content_type in self._EXPECTED_DL_CONTENT_TYPES:  # ipfs
+            if content_type != self._HTML_CONTENT_TYPE:  # ipfs
                 self._to_filesystem(response)
             elif content_type == self._HTML_CONTENT_TYPE and self._IPFS_URI in link:
                 return click.echo(

@@ -34,6 +34,9 @@ class TestPrintHelp:
 
 SEARCH = "Treasure Island Stevenson"
 
+PDF_CONTENT_TYPE = "application/pdf"
+EPUB_CONTENT_TYPE = "application/epub+zip"
+
 
 class TestAnnasEbook:
 
@@ -973,7 +976,7 @@ class TestAnnasEbook:
             class MockResponse:
                 def __init__(self):
                     self._status_code = 200
-                    self._content_type = AnnasEbook._EPUB_CONTENT_TYPE
+                    self._content_type = EPUB_CONTENT_TYPE
 
                 @property
                 def headers(self):
@@ -1005,7 +1008,7 @@ class TestAnnasEbook:
                 },
                 200,
                 None,
-                AnnasEbook._PDF_CONTENT_TYPE,
+                PDF_CONTENT_TYPE,
                 False,
                 False,
                 None,
@@ -1044,7 +1047,7 @@ class TestAnnasEbook:
                 },
                 500,
                 ConnectionError,
-                AnnasEbook._PDF_CONTENT_TYPE,
+                PDF_CONTENT_TYPE,
                 False,
                 False,
                 None,
@@ -1070,7 +1073,7 @@ class TestAnnasEbook:
                 },
                 500,
                 ChunkedEncodingError,
-                AnnasEbook._EPUB_CONTENT_TYPE,
+                EPUB_CONTENT_TYPE,
                 False,
                 False,
                 None,
@@ -1197,7 +1200,7 @@ class TestAnnasEbook:
             )
             echo_spy.assert_has_calls(echo_calls)
 
-        elif response_content_type in AnnasEbook._EXPECTED_DL_CONTENT_TYPES:
+        elif response_content_type != AnnasEbook._HTML_CONTENT_TYPE:
             response = MockResponse(
                 status_code=response_status_code, content_type=response_content_type
             )
