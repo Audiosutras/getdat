@@ -121,8 +121,9 @@ class AnnasEbook:
                 return self._determine_link()
 
     def _get(self, *args, **kwargs):
-        click.echo(click.style(f"\n{self._msg}", fg="bright_yellow"))
-        click.echo("")
+        if self._msg:
+            click.echo(click.style(f"\n{self._msg}", fg="bright_yellow"))
+            click.echo("")
         try:
             response = requests.get(self._get_url(*args, **kwargs))
         except (ConnectionError, ChunkedEncodingError) as e:

@@ -379,7 +379,8 @@ class TestAnnasEbook:
         else:
             mocked_get.return_value = "OK"
             response = ebook._get()
-            spy.assert_called_once_with(f"\n{msg}", fg="bright_yellow")
+            if msg:
+                spy.assert_called_once_with(f"\n{msg}", fg="bright_yellow")
             # No error occured and returns response
             assert response == "OK"
 
