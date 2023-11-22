@@ -37,7 +37,7 @@ def cinema():
 @click.option(
     "-e",
     "--ext",
-    type=click.Choice(["epub", "pdf"]),
+    type=click.Choice(AnnasEbook._FILE_EXT),
     default="epub",
     help=("Preferred ebook extension for search results " "- Default: epub"),
 )

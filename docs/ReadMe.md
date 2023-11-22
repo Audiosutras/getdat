@@ -186,7 +186,7 @@ Commands:
 
 Project uses [pytest](https://docs.pytest.org/en/7.4.x/) for unit testing. Test run quickly with the help of [pytest-mock](https://pytest-mock.readthedocs.io/en/latest/usage.html)
 ```bash
-(getdat-py3.11) -> pytest -v
+(getdat-py3.11) -> pytest -v --cov=. tests/
 ```
 
 Style guide and code check enforced with [pre-commit](https://pre-commit.com/)

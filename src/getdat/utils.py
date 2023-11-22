@@ -30,9 +30,7 @@ class AnnasEbook:
     )
     _MEMBER_LOGIN_REQUIRED = (_FAST_PARTNER_SERVER, _INTERNET_ARCHIVE, _Z_LIBRARY)
     _HTML_CONTENT_TYPE = "text/html"
-    _PDF_CONTENT_TYPE = "application/pdf"
-    _EPUB_CONTENT_TYPE = "application/epub+zip"
-    _EXPECTED_DL_CONTENT_TYPES = (_PDF_CONTENT_TYPE, _EPUB_CONTENT_TYPE)
+
     _IPFS_URI = "ipfs"
 
     _SOURCE_ANNAS = "Anna's Archive"
@@ -45,6 +43,18 @@ class AnnasEbook:
         _ANNAS_GS_URL: "https://annas-archive.gs",
         _ANNAS_SE_URL: "https://annas-archive.se",
     }
+
+    _PDF = "pdf"
+    _EPUB = "epub"
+    _MOBI = "mobi"
+    _CBR = "cbr"
+    _CBZ = "cbz"
+    _FB2 = "fb2"
+    _FB2_ZIP = "fb2.zip"
+    _AZW3 = "azw3"
+    _DJVU = "djvu"
+
+    _FILE_EXT = (_PDF, _EPUB, _MOBI, _CBR, _CBZ, _FB2, _FB2_ZIP, _AZW3, _DJVU)
 
     _SOURCE_DICT = {
         _SOURCE_ANNAS: {
@@ -76,17 +86,18 @@ class AnnasEbook:
     _selected_result = {}
     _msg = "Searching Anna's Archive..."
     _resource_name = ""
+    _search_params = dict()
 
     def __init__(
         self,
         q: tuple,
-        ext: str,
         output_dir: str,
+        ext: Literal[*_FILE_EXT] = _EPUB,
         instance: Literal[*_ANNAS_URLS.keys()] = _ANNAS_ORG_URL,
     ):
         self.q = " ".join(map(str, q))
         self.output_dir = output_dir or os.environ.get("GETDAT_BOOK_DIR")
-        self.ext = ext
+        self._search_params["ext"] = ext
         self.instance = instance
 
     def _determine_source(self) -> dict:
@@ -116,15 +127,17 @@ class AnnasEbook:
         match self._scrape_key:
             case "search_page_scrape":
                 search = f"/search?q={self.q}"
-                if self.ext:
-                    search += f"&ext={self.ext}"
+                for key, value in self._search_params.items():
+                    if value:
+                        search += f"&{key}={value}"
                 return f"{url}{search}"
             case _:
                 return self._determine_link()
 
     def _get(self, *args, **kwargs):
-        click.echo(click.style(f"\n{self._msg}", fg="bright_yellow"))
-        click.echo("")
+        if self._msg:
+            click.echo(click.style(f"\n{self._msg}", fg="bright_yellow"))
+            click.echo("")
         try:
             response = requests.get(self._get_url(*args, **kwargs))
         except (ConnectionError, ChunkedEncodingError) as e:
@@ -299,7 +312,7 @@ class AnnasEbook:
                     )
                 )
             content_type = response.headers.get("Content-Type")
-            if content_type in self._EXPECTED_DL_CONTENT_TYPES:  # ipfs
+            if content_type != self._HTML_CONTENT_TYPE:  # ipfs
                 self._to_filesystem(response)
             elif content_type == self._HTML_CONTENT_TYPE and self._IPFS_URI in link:
                 return click.echo(

@@ -34,6 +34,9 @@ class TestPrintHelp:
 
 SEARCH = "Treasure Island Stevenson"
 
+PDF_CONTENT_TYPE = "application/pdf"
+EPUB_CONTENT_TYPE = "application/epub+zip"
+
 
 class TestAnnasEbook:
 
@@ -76,7 +79,19 @@ class TestAnnasEbook:
         assert ebook_2.output_dir == self.env.get("GETDAT_BOOK_DIR")
 
     @pytest.mark.parametrize(
-        "ext, expected_ext", [("epub", "epub"), ("pdf", "pdf"), ("", "")]
+        "ext, expected_ext",
+        [
+            (AnnasEbook._EPUB, AnnasEbook._EPUB),
+            (AnnasEbook._PDF, AnnasEbook._PDF),
+            (AnnasEbook._MOBI, AnnasEbook._MOBI),
+            (AnnasEbook._CBR, AnnasEbook._CBR),
+            (AnnasEbook._CBZ, AnnasEbook._CBZ),
+            (AnnasEbook._FB2, AnnasEbook._FB2),
+            (AnnasEbook._FB2_ZIP, AnnasEbook._FB2_ZIP),
+            (AnnasEbook._AZW3, AnnasEbook._AZW3),
+            (AnnasEbook._DJVU, AnnasEbook._DJVU),
+            ("err.ext", ""),
+        ],
     )
     def test_ext(self, ext, expected_ext):
         ebook = AnnasEbook(q=self.q, ext=ext, output_dir=self.output_dir)
@@ -376,7 +391,8 @@ class TestAnnasEbook:
         else:
             mocked_get.return_value = "OK"
             response = ebook._get()
-            spy.assert_called_once_with(f"\n{msg}", fg="bright_yellow")
+            if msg:
+                spy.assert_called_once_with(f"\n{msg}", fg="bright_yellow")
             # No error occured and returns response
             assert response == "OK"
 
@@ -973,7 +989,7 @@ class TestAnnasEbook:
             class MockResponse:
                 def __init__(self):
                     self._status_code = 200
-                    self._content_type = AnnasEbook._EPUB_CONTENT_TYPE
+                    self._content_type = EPUB_CONTENT_TYPE
 
                 @property
                 def headers(self):
@@ -1005,7 +1021,7 @@ class TestAnnasEbook:
                 },
                 200,
                 None,
-                AnnasEbook._PDF_CONTENT_TYPE,
+                PDF_CONTENT_TYPE,
                 False,
                 False,
                 None,
@@ -1044,7 +1060,7 @@ class TestAnnasEbook:
                 },
                 500,
                 ConnectionError,
-                AnnasEbook._PDF_CONTENT_TYPE,
+                PDF_CONTENT_TYPE,
                 False,
                 False,
                 None,
@@ -1070,7 +1086,7 @@ class TestAnnasEbook:
                 },
                 500,
                 ChunkedEncodingError,
-                AnnasEbook._EPUB_CONTENT_TYPE,
+                EPUB_CONTENT_TYPE,
                 False,
                 False,
                 None,
@@ -1197,7 +1213,7 @@ class TestAnnasEbook:
             )
             echo_spy.assert_has_calls(echo_calls)
 
-        elif response_content_type in AnnasEbook._EXPECTED_DL_CONTENT_TYPES:
+        elif response_content_type != AnnasEbook._HTML_CONTENT_TYPE:
             response = MockResponse(
                 status_code=response_status_code, content_type=response_content_type
             )
