@@ -44,6 +44,18 @@ class AnnasEbook:
         _ANNAS_SE_URL: "https://annas-archive.se",
     }
 
+    _PDF = "pdf"
+    _EPUB = "epub"
+    _MOBI = "mobi"
+    _CBR = "cbr"
+    _CBZ = "cbz"
+    _FB2 = "fb2"
+    _FB2_ZIP = "fb2.zip"
+    _AZW3 = "azw3"
+    _DJVU = "djvu"
+
+    _FILE_EXT = (_PDF, _EPUB, _MOBI, _CBR, _CBZ, _FB2, _FB2_ZIP, _AZW3, _DJVU)
+
     _SOURCE_DICT = {
         _SOURCE_ANNAS: {
             "name": _SOURCE_ANNAS,
@@ -79,8 +91,8 @@ class AnnasEbook:
     def __init__(
         self,
         q: tuple,
-        ext: str,
         output_dir: str,
+        ext: Literal[*_FILE_EXT] = _EPUB,
         instance: Literal[*_ANNAS_URLS.keys()] = _ANNAS_ORG_URL,
     ):
         self.q = " ".join(map(str, q))

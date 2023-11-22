@@ -79,7 +79,19 @@ class TestAnnasEbook:
         assert ebook_2.output_dir == self.env.get("GETDAT_BOOK_DIR")
 
     @pytest.mark.parametrize(
-        "ext, expected_ext", [("epub", "epub"), ("pdf", "pdf"), ("", "")]
+        "ext, expected_ext",
+        [
+            (AnnasEbook._EPUB, AnnasEbook._EPUB),
+            (AnnasEbook._PDF, AnnasEbook._PDF),
+            (AnnasEbook._MOBI, AnnasEbook._MOBI),
+            (AnnasEbook._CBR, AnnasEbook._CBR),
+            (AnnasEbook._CBZ, AnnasEbook._CBZ),
+            (AnnasEbook._FB2, AnnasEbook._FB2),
+            (AnnasEbook._FB2_ZIP, AnnasEbook._FB2_ZIP),
+            (AnnasEbook._AZW3, AnnasEbook._AZW3),
+            (AnnasEbook._DJVU, AnnasEbook._DJVU),
+            ("err.ext", ""),
+        ],
     )
     def test_ext(self, ext, expected_ext):
         ebook = AnnasEbook(q=self.q, ext=ext, output_dir=self.output_dir)
