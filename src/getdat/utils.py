@@ -74,6 +74,7 @@ class AnnasEbook:
     _selected_result = {}
     _msg = "Searching Anna's Archive..."
     _resource_name = ""
+    _search_params = dict()
 
     def __init__(
         self,
@@ -84,7 +85,7 @@ class AnnasEbook:
     ):
         self.q = " ".join(map(str, q))
         self.output_dir = output_dir or os.environ.get("GETDAT_BOOK_DIR")
-        self.ext = ext
+        self._search_params["ext"] = ext
         self.instance = instance
 
     def _determine_source(self) -> dict:
@@ -114,8 +115,9 @@ class AnnasEbook:
         match self._scrape_key:
             case "search_page_scrape":
                 search = f"/search?q={self.q}"
-                if self.ext:
-                    search += f"&ext={self.ext}"
+                for key, value in self._search_params.items():
+                    if value:
+                        search += f"&{key}={value}"
                 return f"{url}{search}"
             case _:
                 return self._determine_link()
