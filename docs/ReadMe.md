@@ -194,7 +194,7 @@ Style guide and code check enforced with [pre-commit](https://pre-commit.com/)
 (getdat-py3.11) -> pre-commit install
 ```
 
-Running `docs` site locally for making changes to `github-pages` requires [ruby](https://www.ruby-lang.org/en/) to be installed
+Running `docs` site locally for making changes to `github-pages` requires [ruby](https://www.ruby-lang.org/en/) to be installed. After instlalation make sure to install *bundler* with `gem install bundler` as well:
 ```bash
 -> cd docs
 -> bundler install
