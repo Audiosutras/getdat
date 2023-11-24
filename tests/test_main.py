@@ -119,16 +119,11 @@ class TestEbook:
         self.runner.invoke(ebook, ["Treasure", "Island", "Stevenson"])
         ebook_run_method.assert_called_once()
 
-    @pytest.mark.parametrize(
-        "ext_type, expect_error", [("pdf", False), ("epub", False), ("er", True)]
-    )
-    def test_search_arg_ext_option_ebook_run(self, ext_type, expect_error, mocker):
+    @pytest.mark.parametrize("ext", [("pdf",), ("epub,pdf,mobi",)])
+    def test_search_arg_ext_option_ebook_run(self, ext, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
-        self.runner.invoke(ebook, f"Treasure Island Stevenson --ext={ext_type}")
-        if expect_error:
-            ebook_run_method.assert_not_called()
-        else:
-            ebook_run_method.assert_called_once()
+        self.runner.invoke(ebook, f"Treasure Island Stevenson --ext={ext}")
+        ebook_run_method.assert_called_once()
 
     def test_search_arg_lang_option_ebook_run(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")

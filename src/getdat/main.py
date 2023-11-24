@@ -37,8 +37,12 @@ def cinema():
 @click.option(
     "-e",
     "--ext",
-    type=click.Choice(AnnasEbook._FILE_EXT),
-    help=("Preferred ebook extension for ebooks in search results."),
+    help=(
+        "Preferred ebook extension for ebooks in search results. "
+        f"Options: {', '.join(AnnasEbook._FILE_EXT)}. "
+        "Filter by multiple file extensions supported. Example: "
+        "pdf,epub,mobi"
+    ),
 )
 @click.option(
     "-l",
