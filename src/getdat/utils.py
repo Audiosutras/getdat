@@ -56,6 +56,27 @@ class AnnasEbook:
 
     _FILE_EXT = (_PDF, _EPUB, _MOBI, _CBR, _CBZ, _FB2, _FB2_ZIP, _AZW3, _DJVU)
 
+    _BOOK_NF = "nf"
+    _BOOK_F = "f"
+    _BOOK_U = "u"
+    _JOURNAL = "ja"
+    _COMIC = "cb"
+    _MAGAZINE = "m"
+    _STANDARDS_DOC = "sd"
+
+    _CONTENT_OPTIONS = {
+        _BOOK_NF: {"label": "Book (non-fiction)", "value": "book_nonfiction"},
+        _BOOK_F: {"label": "Book (fiction)", "value": "book_fiction"},
+        _BOOK_U: {"label": "Book (unknown)", "value": "book_unknown"},
+        _JOURNAL: {"label": "Journal article", "value": "journal_article"},
+        _COMIC: {"label": "Comic book", "value": "book_comic"},
+        _MAGAZINE: {"label": "Magazine", "value": "magazine"},
+        _STANDARDS_DOC: {"label": "Standards document", "value": "standards_document"},
+    }
+
+    _CONTENT_OPTIONS_EBOOK_HELP = ", ".join(
+        [f'{v["value"]}: {k}' for k, v in _CONTENT_OPTIONS.items()]
+    )
     _SOURCE_DICT = {
         _SOURCE_ANNAS: {
             "name": _SOURCE_ANNAS,
@@ -93,16 +114,15 @@ class AnnasEbook:
         q: tuple,
         output_dir: str,
         lang: str,
+        content: str,
         ext: str,
         instance=_ANNAS_ORG_URL,
     ):
         self.q = " ".join(map(str, q))
         self.output_dir = output_dir or os.environ.get("GETDAT_BOOK_DIR")
-        if ext in self._FILE_EXT:
-            self._search_params["ext"] = ext
-        else:
-            self._search_params["ext"] = ""
+        self._search_params["ext"] = ext
         self._search_params["lang"] = lang
+        self._search_params["content"] = content
         if instance in self._ANNAS_URLS.keys():
             self.instance = instance
         else:
@@ -140,9 +160,28 @@ class AnnasEbook:
                         try:
                             value_list = value.split(",")
                             for v in value_list:
-                                search += f"&{key}={v}"
+                                match key:
+                                    case "content":
+                                        if v in self._CONTENT_OPTIONS.keys():
+                                            search_value = self._CONTENT_OPTIONS.get(
+                                                v
+                                            ).get("value")
+                                            search += f"&{key}={search_value}"
+                                    case _:
+                                        search += f"&{key}={v}"
                         except AttributeError:
-                            search += f"&{key}={value}"
+                            match key:
+                                case "ext":
+                                    if value in self._FILE_EXT:
+                                        search += f"&{key}={value}"
+                                case "content":
+                                    if value in self._CONTENT_OPTIONS.keys():
+                                        search_value = self._CONTENT_OPTIONS.get(
+                                            value
+                                        ).get("value")
+                                        search += f"&{key}={search_value}"
+                                case _:
+                                    search += f"&{key}={value}"
                 return f"{url}{search}"
             case _:
                 return self._determine_link()

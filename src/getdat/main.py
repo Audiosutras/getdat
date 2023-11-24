@@ -53,6 +53,16 @@ def cinema():
     ),
 )
 @click.option(
+    "-c",
+    "--content",
+    help=(
+        "The type of content you want as ebook search results. "
+        f"{AnnasEbook._CONTENT_OPTIONS_EBOOK_HELP}. "
+        "Supports filtering by multiple content types. "
+        " Example: nf,f,cb"
+    ),
+)
+@click.option(
     "-i",
     "--instance",
     type=click.Choice(AnnasEbook._ANNAS_URLS.keys()),
@@ -65,7 +75,7 @@ def cinema():
     ),
 )
 @click.argument("q", nargs=-1)
-def ebook(q, ext, lang, output_dir, instance):
+def ebook(q, ext, lang, content, output_dir, instance):
     """Search and download an ebook available through Anna's Archive
 
     ex: getdat ebook <Search>
@@ -73,6 +83,11 @@ def ebook(q, ext, lang, output_dir, instance):
     if not q:
         print_help(EBOOK_ERROR_MSG)
     ebook = AnnasEbook(
-        q=q, ext=ext, lang=lang, output_dir=output_dir, instance=instance
+        q=q,
+        ext=ext,
+        lang=lang,
+        content=content,
+        output_dir=output_dir,
+        instance=instance,
     )
     ebook.run()
