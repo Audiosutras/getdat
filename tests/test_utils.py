@@ -62,7 +62,9 @@ class TestAnnasEbook:
         ],
     )
     def test_q_1_arg_and_many_args(self, test_q_args, expected_q):
-        ebook = AnnasEbook(q=test_q_args, ext="pdf", lang="", output_dir="")
+        ebook = AnnasEbook(
+            q=test_q_args, ext=self.ext, lang=self.lang, output_dir=self.output_dir
+        )
         assert ebook.q == expected_q
 
     def test_output_dir(self, mocker):
@@ -78,7 +80,7 @@ class TestAnnasEbook:
         # option_output_dir overrides GETDAT_BOOK_DIR
         assert ebook_1.output_dir == self.output_dir
         # GETDAT_BOOK_DIR determines output_dir
-        ebook_2 = AnnasEbook(q=self.q, ext="epub", lang=self.lang, output_dir="")
+        ebook_2 = AnnasEbook(q=self.q, ext=self.ext, lang=self.lang, output_dir="")
         assert ebook_2.output_dir == self.env.get("GETDAT_BOOK_DIR")
 
     @pytest.mark.parametrize(
@@ -100,7 +102,22 @@ class TestAnnasEbook:
         ebook = AnnasEbook(
             q=self.q, ext=ext, lang=self.lang, output_dir=self.output_dir
         )
-        ebook.ext = expected_ext
+        assert ebook._search_params["ext"] == expected_ext
+
+    @pytest.mark.parametrize(
+        "lang, expected_lang",
+        [
+            ("en", "en"),
+            ("es,en", "es,en"),
+            ("zh-Hans", "zh-Hans"),
+            ("zh,es,zh-Hans", "zh,es,zh-Hans"),
+        ],
+    )
+    def test_lang(self, lang, expected_lang):
+        ebook = AnnasEbook(
+            q=self.q, ext=self.ext, lang=lang, output_dir=self.output_dir
+        )
+        assert ebook._search_params["lang"] == expected_lang
 
     @pytest.mark.parametrize(
         "instance",
@@ -109,10 +126,11 @@ class TestAnnasEbook:
             (AnnasEbook._ANNAS_GS_URL),
             (AnnasEbook._ANNAS_SE_URL),
             (""),
+            ("rs"),
         ],
     )
     def test_instance(self, instance):
-        if instance:
+        if instance in AnnasEbook._ANNAS_URLS.keys():
             ebook = AnnasEbook(
                 q=self.q,
                 ext=self.ext,
@@ -266,6 +284,15 @@ class TestAnnasEbook:
                 f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=epub",
             ),
             (
+                "epub",
+                "en",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {},
+                "search_page_scrape",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=epub&lang=en",
+            ),
+            (
                 "pdf",
                 "",
                 None,
@@ -273,6 +300,15 @@ class TestAnnasEbook:
                 {},
                 "search_page_scrape",
                 f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=pdf",
+            ),
+            (
+                "pdf",
+                "en,es,zh-Hant",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {},
+                "search_page_scrape",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=pdf&lang=en&lang=es&lang=zh-Hant",
             ),
             (
                 "",
@@ -284,8 +320,17 @@ class TestAnnasEbook:
                 f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}",
             ),
             (
-                "pdf",
                 "",
+                "en,es",
+                None,
+                AnnasEbook._SOURCE_ANNAS,
+                {},
+                "search_page_scrape",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&lang=en&lang=es",
+            ),
+            (
+                "pdf",
+                "en,es",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {"link": "https://books.google.com"},
@@ -330,7 +375,7 @@ class TestAnnasEbook:
             ),
             (
                 "",
-                "",
+                "en,es",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {"link": "/md5/234890238402380423"},
@@ -339,7 +384,7 @@ class TestAnnasEbook:
             ),
             (
                 "epub",
-                "",
+                "en,es",
                 "https://solid-books.google.com",
                 AnnasEbook._LIBGEN_LI,
                 {"link": "/md5/234890238402380423"},
@@ -357,7 +402,7 @@ class TestAnnasEbook:
             ),
             (
                 "",
-                "",
+                "en,es",
                 "http://big-solid-books.google.com/?md5=32480238402384023",
                 AnnasEbook._LIBGEN_RS,
                 {},
