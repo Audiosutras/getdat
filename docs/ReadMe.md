@@ -107,28 +107,37 @@ Usage: getdat ebook [OPTIONS] [Q]...
   ex: getdat ebook <Search>
 
 Options:
-  -o, --output_dir TEXT       Path to ebook's output directory from home
-                              directory. Path must be prefixed by '~' on Unix
-                              or '~user' on Windows. This argument overrides
-                              GETDAT_BOOK_DIR env var if set. Outputs book to
-                              working directory if neither are set.
-  -e, --ext [epub|pdf]        Preferred ebook extension for search results -
-                              Default: epub
-  -i, --instance [org|gs|se]  The instance of Anna's Archive you would like to
-                              use for your search:  https://annas-archive.org,
-                              https://annas-archive.gs, https://annas-
-                              archive.se - Default: org
-  --help                      Show this message and exit.
+  -o, --output_dir TEXT           Path to ebook's output directory from home
+                                  directory. Path must be prefixed by '~' on
+                                  Unix or '~user' on Windows. This argument
+                                  overrides GETDAT_BOOK_DIR env var if set.
+                                  Outputs book to working directory if neither
+                                  are set.
+  -e, --ext [pdf|epub|mobi|cbr|cbz|fb2|fb2.zip|azw3|djvu]
+                                  Preferred ebook extension for ebooks in
+                                  search results.
+  -l, --lang TEXT                 Preferred language of ebooks in search
+                                  results. Provided Language must be ISO 639-1
+                                  format. Language region extension supported.
+                                  Filtering by multiple languages supported.
+                                  Examples: English - en, Spanish - es,
+                                  Traditional Chinese - zh-Hant, Multiple
+                                  Langauges - en,es,zh-Hant
+  -i, --instance [org|gs|se]      The instance of Anna's Archive you would
+                                  like to use for your search:  https://annas-
+                                  archive.org, https://annas-archive.gs,
+                                  https://annas-archive.se - Default: org
+  --help                          Show this message and exit.
 
 ```
 
 Example:
 ```bash
--> getdat ebook Treasure Island Stevenson --ext=epub --output_dir=~/books/epub/ --instance=gs
+-> getdat ebook Treasure Island Stevenson --ext=epub --output_dir=~/books/epub/ --instance=gs --lang=en,es,zh-Hant
 ```
 or
 ```bash
--> getdat ebook "Treasure Island Stevenson" -e epub -o ~/books/epub -i gs
+-> getdat ebook "Treasure Island Stevenson" -e epub -o ~/books/epub -i gs -l es
 ```
 or
 ```bash
