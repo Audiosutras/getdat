@@ -157,31 +157,20 @@ class AnnasEbook:
                 search = f"/search?q={self.q}"
                 for key, value in self._search_params.items():
                     if value:
-                        try:
-                            value_list = value.split(",")
-                            for v in value_list:
-                                match key:
-                                    case "content":
-                                        if v in self._CONTENT_OPTIONS.keys():
-                                            search_value = self._CONTENT_OPTIONS.get(
-                                                v
-                                            ).get("value")
-                                            search += f"&{key}={search_value}"
-                                    case _:
-                                        search += f"&{key}={v}"
-                        except AttributeError:
+                        value_list = value.split(",")
+                        for v in value_list:
                             match key:
                                 case "ext":
-                                    if value in self._FILE_EXT:
-                                        search += f"&{key}={value}"
+                                    if v in self._FILE_EXT:
+                                        search += f"&{key}={v}"
                                 case "content":
-                                    if value in self._CONTENT_OPTIONS.keys():
-                                        search_value = self._CONTENT_OPTIONS.get(
-                                            value
-                                        ).get("value")
+                                    if v in self._CONTENT_OPTIONS.keys():
+                                        search_value = self._CONTENT_OPTIONS.get(v).get(
+                                            "value"
+                                        )
                                         search += f"&{key}={search_value}"
                                 case _:
-                                    search += f"&{key}={value}"
+                                    search += f"&{key}={v}"
                 return f"{url}{search}"
             case _:
                 return self._determine_link()

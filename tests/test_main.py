@@ -71,6 +71,15 @@ class TestEbook:
         assert self.get_help_text() in results.output
         ebook_run_method.assert_not_called()
 
+    def test_no_args_only_content_option_print_help(self, mocker):
+        ebook_run_method = mocker.patch.object(AnnasEbook, "run")
+        results = self.runner.invoke(ebook, "--content=cb")
+        # assert error message echoed
+        assert EBOOK_ERROR_MSG in results.output
+        # assert help text prompt shown
+        assert self.get_help_text() in results.output
+        ebook_run_method.assert_not_called()
+
     def test_no_args_only_output_dir_option_print_help(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
         results = self.runner.invoke(ebook, "--output_dir=~/books")
@@ -92,7 +101,7 @@ class TestEbook:
     def test_no_args_only_options_print_help(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
         results = self.runner.invoke(
-            ebook, "--ext=pdf --output_dir=~/books --instance=gs"
+            ebook, "--ext=pdf --content=nf,f --output_dir=~/books --instance=gs"
         )
         # assert error message echoed
         assert EBOOK_ERROR_MSG in results.output
@@ -124,6 +133,19 @@ class TestEbook:
     def test_search_arg_lang_option_ebook_run(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
         self.runner.invoke(ebook, "Treasure Island Stevenson --lang=es")
+        ebook_run_method.assert_called_once()
+
+    @pytest.mark.parametrize(
+        "content",
+        [
+            ("cb",),
+            ("f,cb",),
+            ("xoxo",),  # should still call ebook.run() even thought not valid
+        ],
+    )
+    def test_search_arg_content_option_ebook_run(self, content, mocker):
+        ebook_run_method = mocker.patch.object(AnnasEbook, "run")
+        self.runner.invoke(ebook, f"Treasure Island Stevenson --content={content}")
         ebook_run_method.assert_called_once()
 
     def test_search_arg_output_dir_option_ebook_run(self, mocker):
