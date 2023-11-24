@@ -46,9 +46,10 @@ def cinema():
     help=(
         "Preferred language of ebooks in search results. "
         "Provided Language must be ISO 639-1 format. "
-        "Language region extension supported as well. "
+        "Language region extension supported. "
+        "Filtering by multiple languages supported. "
         "Examples: English - en, Spanish - es, Traditional "
-        "Chinese - zh-Hant."
+        "Chinese - zh-Hant, Multiple Langauges - en,es,zh-Hant "
     ),
 )
 @click.option(

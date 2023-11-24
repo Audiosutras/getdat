@@ -131,7 +131,12 @@ class AnnasEbook:
                 search = f"/search?q={self.q}"
                 for key, value in self._search_params.items():
                     if value:
-                        search += f"&{key}={value}"
+                        try:
+                            value_list = value.split(",")
+                            for v in value_list:
+                                search += f"&{key}={v}"
+                        except AttributeError:
+                            search += f"&{key}={value}"
                 return f"{url}{search}"
             case _:
                 return self._determine_link()
