@@ -30,7 +30,9 @@ Table of Contents
 - [Installation Methods](#installation-methods)
 - [Commands](#commands)
 - [Local Development](#local-development)
-- [Deployment - Publishing GetDat](#deployment---publishing-getdat)
+- [Deployment](#deployment)
+  - [Publishing Getdat](#publishing-getdat)
+  - [Publishing Docs](#publishing-docs)
 - [Contributors](#contributors)
 
 ## Installation Methods
@@ -211,7 +213,9 @@ Running `docs` site locally for making changes to `github-pages` requires [ruby]
 -> bundler exec jekyll serve
 ```
 
-## Deployment - Publishing Getdat
+## Deployment
+
+### Publishing Getdat
 
 Workflow: `master` branch
 
@@ -229,6 +233,9 @@ Workflow: `master` branch
 ```bash
 -> pipx install getdat
 ```
+
+### Publishing Docs
+Docs are published to the [site](https://getdat.chrisdixononcode.dev) when a release is created for the python package to pypi.org. This is *automated*, but can be triggered manually by running the github workflow *Deploy Jekyll with GitHub Pages dependencies preinstalled*.
 
 ---
 ## Contributors
