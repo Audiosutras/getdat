@@ -92,13 +92,21 @@ class AnnasEbook:
         self,
         q: tuple,
         output_dir: str,
-        ext: Literal[*_FILE_EXT] = _EPUB,
-        instance: Literal[*_ANNAS_URLS.keys()] = _ANNAS_ORG_URL,
+        lang: str,
+        ext: str,
+        instance=_ANNAS_ORG_URL,
     ):
         self.q = " ".join(map(str, q))
         self.output_dir = output_dir or os.environ.get("GETDAT_BOOK_DIR")
-        self._search_params["ext"] = ext
-        self.instance = instance
+        if ext in self._FILE_EXT:
+            self._search_params["ext"] = ext
+        else:
+            self._search_params["ext"] = ""
+        self._search_params["lang"] = lang
+        if instance in self._ANNAS_URLS.keys():
+            self.instance = instance
+        else:
+            self.instance = self._ANNAS_ORG_URL
 
     def _determine_source(self) -> dict:
         source = self._SOURCE_DICT.get(self._current_source)
@@ -129,7 +137,12 @@ class AnnasEbook:
                 search = f"/search?q={self.q}"
                 for key, value in self._search_params.items():
                     if value:
-                        search += f"&{key}={value}"
+                        try:
+                            value_list = value.split(",")
+                            for v in value_list:
+                                search += f"&{key}={v}"
+                        except AttributeError:
+                            search += f"&{key}={value}"
                 return f"{url}{search}"
             case _:
                 return self._determine_link()

@@ -62,6 +62,15 @@ class TestEbook:
         assert self.get_help_text() in results.output
         ebook_run_method.assert_not_called()
 
+    def test_no_args_only_lang_option_print_help(self, mocker):
+        ebook_run_method = mocker.patch.object(AnnasEbook, "run")
+        results = self.runner.invoke(ebook, "--lang=zh")
+        # assert error message echoed
+        assert EBOOK_ERROR_MSG in results.output
+        # assert help text prompt shown
+        assert self.get_help_text() in results.output
+        ebook_run_method.assert_not_called()
+
     def test_no_args_only_output_dir_option_print_help(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
         results = self.runner.invoke(ebook, "--output_dir=~/books")
@@ -111,6 +120,11 @@ class TestEbook:
             ebook_run_method.assert_not_called()
         else:
             ebook_run_method.assert_called_once()
+
+    def test_search_arg_lang_option_ebook_run(self, mocker):
+        ebook_run_method = mocker.patch.object(AnnasEbook, "run")
+        self.runner.invoke(ebook, "Treasure Island Stevenson --lang=es")
+        ebook_run_method.assert_called_once()
 
     def test_search_arg_output_dir_option_ebook_run(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")

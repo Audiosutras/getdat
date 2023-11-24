@@ -38,8 +38,19 @@ def cinema():
     "-e",
     "--ext",
     type=click.Choice(AnnasEbook._FILE_EXT),
-    default="epub",
-    help=("Preferred ebook extension for search results " "- Default: epub"),
+    help=("Preferred ebook extension for ebooks in search results."),
+)
+@click.option(
+    "-l",
+    "--lang",
+    help=(
+        "Preferred language of ebooks in search results. "
+        "Provided Language must be ISO 639-1 format. "
+        "Language region extension supported. "
+        "Filtering by multiple languages supported. "
+        "Examples: English - en, Spanish - es, Traditional "
+        "Chinese - zh-Hant, Multiple Langauges - en,es,zh-Hant "
+    ),
 )
 @click.option(
     "-i",
@@ -54,12 +65,14 @@ def cinema():
     ),
 )
 @click.argument("q", nargs=-1)
-def ebook(q, ext, output_dir, instance):
+def ebook(q, ext, lang, output_dir, instance):
     """Search and download an ebook available through Anna's Archive
 
     ex: getdat ebook <Search>
     """
     if not q:
         print_help(EBOOK_ERROR_MSG)
-    ebook = AnnasEbook(q=q, ext=ext, output_dir=output_dir, instance=instance)
+    ebook = AnnasEbook(
+        q=q, ext=ext, lang=lang, output_dir=output_dir, instance=instance
+    )
     ebook.run()
