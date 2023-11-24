@@ -92,12 +92,14 @@ class AnnasEbook:
         self,
         q: tuple,
         output_dir: str,
-        ext: Literal[*_FILE_EXT] = _EPUB,
+        lang: str,
+        ext: Literal[*_FILE_EXT],
         instance: Literal[*_ANNAS_URLS.keys()] = _ANNAS_ORG_URL,
     ):
         self.q = " ".join(map(str, q))
         self.output_dir = output_dir or os.environ.get("GETDAT_BOOK_DIR")
         self._search_params["ext"] = ext
+        self._search_params["lang"] = lang
         self.instance = instance
 
     def _determine_source(self) -> dict:
