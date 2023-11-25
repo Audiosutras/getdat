@@ -132,6 +132,11 @@ class AnnasEbook:
         else:
             self.instance = self._ANNAS_ORG_URL
 
+    @staticmethod
+    def _cli_exit(code=0):
+        ctx = click.get_current_context()
+        ctx.exit(code)
+
     def _determine_source(self) -> dict:
         source = self._SOURCE_DICT.get(self._current_source)
         if self._current_source == self._SOURCE_ANNAS:
@@ -234,10 +239,10 @@ class AnnasEbook:
         return results
 
     def _echo_formatted_title(self, key, title_str):
-        title_list = title_str.split(", ", 3)
         try:
+            title_list = title_str.split(", ", 3)
             [lang, ext, size, title] = title_list
-        except ValueError:
+        except (ValueError, AttributeError):
             return click.echo(
                 click.style(f" {key} | {self._ENTRY_NOT_DISPLAYED}", fg="bright_red")
             )
@@ -279,12 +284,11 @@ class AnnasEbook:
         click.echo("")
         return have_results
 
-    def _scrape_page(self, *args, **kwargs) -> int:
+    def _scrape_page(self, *args, **kwargs):
         try:
             response = self._get(*args, **kwargs)
         except (ConnectionError, ChunkedEncodingError):
-            ctx = click.get_current_context()
-            ctx.exit(1)
+            self._cli_exit(code=1)
         else:
             results = self._scrape_results(response)
             have_results = self._echo_results(results)
@@ -295,6 +299,8 @@ class AnnasEbook:
                 self._selected_result = results.get(str(value))
                 selected_link = self._selected_result.get("link")
                 return value
+            else:
+                self._cli_exit()
 
     def _to_filesystem(self, response: Response):
         """Write file to filesystem if it does not already exists
