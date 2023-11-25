@@ -897,6 +897,11 @@ class TestAnnasEbook:
                 "Treasure Island - Stevenson, Robert Louis.epub",
                 f" 4 | {AnnasEbook._ENTRY_NOT_DISPLAYED}",
             ),
+            (
+                "5",
+                None,
+                f" 5 | {AnnasEbook._ENTRY_NOT_DISPLAYED}",
+            ),
         ],
     )
     def test__echo_formatted_title(self, key, title_str, expected_str, mocker):
@@ -1200,11 +1205,62 @@ class TestAnnasEbook:
         assert value == expected_value
         assert ebook._selected_result == expected_selected_result
 
+    def test__scrape_page_no_results(self, mocker):
+        ebook = AnnasEbook(
+            q=self.q,
+            ext=self.ext,
+            lang=self.lang,
+            content=self.content,
+            sort=self.sort,
+            output_dir=self.output_dir,
+        )
+        mock_get = mocker.patch.object(ebook, "_get")
+        mock_echo_results = mocker.patch.object(ebook, "_echo_results")
+        mock_cli_exit = mocker.patch.object(ebook, "_cli_exit")
+
+        class MockResponse:
+            @property
+            def url(self):
+                return AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get("url")
+
+            @property
+            def content(self):
+                with open("tests/static/annas_archive_detail.html") as f:
+                    return f.read()
+
+        mock_get.return_value = MockResponse()
+        mock_echo_results.return_value = False
+        ebook._scrape_page()
+        mock_cli_exit.assert_called_once()
+
+    @pytest.mark.parametrize("error", [(ConnectionError,), (ChunkedEncodingError,)])
+    def test__scrape_page_error_occurs(self, error, mocker):
+        ebook = AnnasEbook(
+            q=self.q,
+            ext=self.ext,
+            lang=self.lang,
+            content=self.content,
+            sort=self.sort,
+            output_dir=self.output_dir,
+        )
+        mock_get = mocker.patch.object(ebook, "_get")
+        mock_cli_exit = mocker.patch.object(ebook, "_cli_exit")
+
+        mock_get.side_effect = error
+        ebook._scrape_page()
+        mock_cli_exit.assert_called_once_with(code=1)
+
     @pytest.mark.parametrize(
         "_resource_name, html_file_path, output_dir, error",
         [
             (
                 "English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub",
+                "tests/static/annas_archive_detail.html",
+                "~/books/epub/dir",
+                None,
+            ),
+            (
+                "English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis",
                 "tests/static/annas_archive_detail.html",
                 "~/books/epub/dir",
                 None,
@@ -1262,6 +1318,9 @@ class TestAnnasEbook:
         else:
             ebook._to_filesystem(response=MockResponse())
         resource_name = _resource_name.split(", ", 3)[-1]
+        ext = _resource_name.split(", ", 3)[1].strip()
+        if f".{ext}" not in resource_name:
+            resource_name = f"{resource_name}.{ext}"
         if output_dir:
             resource_path = os.path.join(os.path.expanduser(output_dir), resource_name)
             mock_open.assert_called_once_with(resource_path, "wb")
