@@ -308,6 +308,9 @@ class AnnasEbook:
         Throws a FileNotFoundError if self.output_dir is not valid
         """
         resource_name = self._resource_name.split(", ", 3)[-1]
+        ext = self._resource_name.split(", ", 3)[1].strip()
+        if f".{ext}" not in resource_name:
+            resource_name = f"{resource_name}.{ext}"
         if self.output_dir:
             resource_path = os.path.join(
                 os.path.expanduser(self.output_dir), resource_name

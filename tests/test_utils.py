@@ -1260,6 +1260,12 @@ class TestAnnasEbook:
                 None,
             ),
             (
+                "English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis",
+                "tests/static/annas_archive_detail.html",
+                "~/books/epub/dir",
+                None,
+            ),
+            (
                 "English [en], epub, 0.3MB, Treasure Island - Stevenson, Robert Louis.epub",
                 "tests/static/annas_archive_detail.html",
                 "~/books/epub/dir",
@@ -1312,6 +1318,9 @@ class TestAnnasEbook:
         else:
             ebook._to_filesystem(response=MockResponse())
         resource_name = _resource_name.split(", ", 3)[-1]
+        ext = _resource_name.split(", ", 3)[1].strip()
+        if f".{ext}" not in resource_name:
+            resource_name = f"{resource_name}.{ext}"
         if output_dir:
             resource_path = os.path.join(os.path.expanduser(output_dir), resource_name)
             mock_open.assert_called_once_with(resource_path, "wb")
