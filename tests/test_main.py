@@ -71,6 +71,24 @@ class TestEbook:
         assert self.get_help_text() in results.output
         ebook_run_method.assert_not_called()
 
+    def test_no_args_only_content_option_print_help(self, mocker):
+        ebook_run_method = mocker.patch.object(AnnasEbook, "run")
+        results = self.runner.invoke(ebook, "--content=cb")
+        # assert error message echoed
+        assert EBOOK_ERROR_MSG in results.output
+        # assert help text prompt shown
+        assert self.get_help_text() in results.output
+        ebook_run_method.assert_not_called()
+
+    def test_no_args_only_sort_option_print_help(self, mocker):
+        ebook_run_method = mocker.patch.object(AnnasEbook, "run")
+        results = self.runner.invoke(ebook, "--sort=smallest")
+        # assert error message echoed
+        assert EBOOK_ERROR_MSG in results.output
+        # assert help text prompt shown
+        assert self.get_help_text() in results.output
+        ebook_run_method.assert_not_called()
+
     def test_no_args_only_output_dir_option_print_help(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
         results = self.runner.invoke(ebook, "--output_dir=~/books")
@@ -92,7 +110,8 @@ class TestEbook:
     def test_no_args_only_options_print_help(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
         results = self.runner.invoke(
-            ebook, "--ext=pdf --output_dir=~/books --instance=gs"
+            ebook,
+            "--ext=pdf --content=nf,f --sort=oldest --output_dir=~/books --instance=gs",
         )
         # assert error message echoed
         assert EBOOK_ERROR_MSG in results.output
@@ -110,21 +129,38 @@ class TestEbook:
         self.runner.invoke(ebook, ["Treasure", "Island", "Stevenson"])
         ebook_run_method.assert_called_once()
 
-    @pytest.mark.parametrize(
-        "ext_type, expect_error", [("pdf", False), ("epub", False), ("er", True)]
-    )
-    def test_search_arg_ext_option_ebook_run(self, ext_type, expect_error, mocker):
+    @pytest.mark.parametrize("ext", [("pdf",), ("epub,pdf,mobi",)])
+    def test_search_arg_ext_option_ebook_run(self, ext, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
-        self.runner.invoke(ebook, f"Treasure Island Stevenson --ext={ext_type}")
-        if expect_error:
-            ebook_run_method.assert_not_called()
-        else:
-            ebook_run_method.assert_called_once()
+        self.runner.invoke(ebook, f"Treasure Island Stevenson --ext={ext}")
+        ebook_run_method.assert_called_once()
 
     def test_search_arg_lang_option_ebook_run(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")
         self.runner.invoke(ebook, "Treasure Island Stevenson --lang=es")
         ebook_run_method.assert_called_once()
+
+    @pytest.mark.parametrize(
+        "content",
+        [
+            ("cb",),
+            ("f,cb",),
+            ("xoxo",),  # should still call ebook.run() even thought not valid
+        ],
+    )
+    def test_search_arg_content_option_ebook_run(self, content, mocker):
+        ebook_run_method = mocker.patch.object(AnnasEbook, "run")
+        self.runner.invoke(ebook, f"Treasure Island Stevenson --content={content}")
+        ebook_run_method.assert_called_once()
+
+    @pytest.mark.parametrize("sort, has_error", [("smallest", False), ("golden", True)])
+    def test_search_arg_sort_option_ebook_run(self, sort, has_error, mocker):
+        ebook_run_method = mocker.patch.object(AnnasEbook, "run")
+        self.runner.invoke(ebook, f"Treasure Island Stevenson --sort={sort}")
+        if has_error:
+            ebook_run_method.assert_not_called()
+        else:
+            ebook_run_method.assert_called_once()
 
     def test_search_arg_output_dir_option_ebook_run(self, mocker):
         ebook_run_method = mocker.patch.object(AnnasEbook, "run")

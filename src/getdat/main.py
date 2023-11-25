@@ -37,8 +37,12 @@ def cinema():
 @click.option(
     "-e",
     "--ext",
-    type=click.Choice(AnnasEbook._FILE_EXT),
-    help=("Preferred ebook extension for ebooks in search results."),
+    help=(
+        "Preferred ebook extension for ebooks in search results. "
+        f"Options: {', '.join(AnnasEbook._FILE_EXT)}. "
+        "Filter by multiple file extensions supported. Example: "
+        "pdf,epub,mobi"
+    ),
 )
 @click.option(
     "-l",
@@ -50,6 +54,27 @@ def cinema():
         "Filtering by multiple languages supported. "
         "Examples: English - en, Spanish - es, Traditional "
         "Chinese - zh-Hant, Multiple Langauges - en,es,zh-Hant "
+    ),
+)
+@click.option(
+    "-c",
+    "--content",
+    help=(
+        "The type of content you want as ebook search results. "
+        f"{AnnasEbook._CONTENT_OPTIONS_EBOOK_HELP}. "
+        "Supports filtering by multiple content types. "
+        " Example: nf,f,cb"
+    ),
+)
+@click.option(
+    "-s",
+    "--sort",
+    type=click.Choice(AnnasEbook._SORT_ENTRIES),
+    help=(
+        "Preferred sorting of search results for ebooks. By "
+        "default search results are sorted by most relevant results. "
+        "Sort by: Newest entries, oldest entries, entries with the "
+        "smallest size, entries with the largest size."
     ),
 )
 @click.option(
@@ -65,7 +90,7 @@ def cinema():
     ),
 )
 @click.argument("q", nargs=-1)
-def ebook(q, ext, lang, output_dir, instance):
+def ebook(q, ext, lang, content, sort, output_dir, instance):
     """Search and download an ebook available through Anna's Archive
 
     ex: getdat ebook <Search>
@@ -73,6 +98,12 @@ def ebook(q, ext, lang, output_dir, instance):
     if not q:
         print_help(EBOOK_ERROR_MSG)
     ebook = AnnasEbook(
-        q=q, ext=ext, lang=lang, output_dir=output_dir, instance=instance
+        q=q,
+        ext=ext,
+        lang=lang,
+        content=content,
+        sort=sort,
+        output_dir=output_dir,
+        instance=instance,
     )
     ebook.run()
