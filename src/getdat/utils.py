@@ -77,6 +77,8 @@ class AnnasEbook:
     _CONTENT_OPTIONS_EBOOK_HELP = ", ".join(
         [f'{v["value"]}: {k}' for k, v in _CONTENT_OPTIONS.items()]
     )
+
+    _SORT_ENTRIES = ["newest", "oldest", "smallest", "largest"]
     _SOURCE_DICT = {
         _SOURCE_ANNAS: {
             "name": _SOURCE_ANNAS,
@@ -115,6 +117,7 @@ class AnnasEbook:
         output_dir: str,
         lang: str,
         content: str,
+        sort: str,
         ext: str,
         instance=_ANNAS_ORG_URL,
     ):
@@ -123,6 +126,7 @@ class AnnasEbook:
         self._search_params["ext"] = ext
         self._search_params["lang"] = lang
         self._search_params["content"] = content
+        self._search_params["sort"] = sort
         if instance in self._ANNAS_URLS.keys():
             self.instance = instance
         else:

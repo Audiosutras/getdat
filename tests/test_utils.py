@@ -46,6 +46,7 @@ class TestAnnasEbook:
     ext = "epub"
     lang = "en"
     content = ""
+    sort = ""
     output_dir = "~/books/epub"
 
     @pytest.mark.parametrize(
@@ -68,6 +69,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         assert ebook.q == expected_q
@@ -76,7 +78,12 @@ class TestAnnasEbook:
         patched_env = mocker.patch.dict("os.environ", clear=True)
         # Neither option_output_dir or GETDAT_BOOK_DIR is set
         ebook = AnnasEbook(
-            q=self.q, ext=self.ext, lang=self.lang, content=self.content, output_dir=""
+            q=self.q,
+            ext=self.ext,
+            lang=self.lang,
+            content=self.content,
+            sort=self.sort,
+            output_dir="",
         )
         assert ebook.output_dir is None
         # GETDAT_BOOK_DIR loaded into environment
@@ -86,13 +93,19 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         # option_output_dir overrides GETDAT_BOOK_DIR
         assert ebook_1.output_dir == self.output_dir
         # GETDAT_BOOK_DIR determines output_dir
         ebook_2 = AnnasEbook(
-            q=self.q, ext=self.ext, lang=self.lang, content=self.content, output_dir=""
+            q=self.q,
+            ext=self.ext,
+            lang=self.lang,
+            content=self.content,
+            sort=self.sort,
+            output_dir="",
         )
         assert ebook_2.output_dir == self.env.get("GETDAT_BOOK_DIR")
 
@@ -120,6 +133,7 @@ class TestAnnasEbook:
             ext=ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         assert ebook._search_params["ext"] == expected_ext
@@ -139,6 +153,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         assert ebook._search_params["lang"] == expected_lang
@@ -160,6 +175,7 @@ class TestAnnasEbook:
                 ext=self.ext,
                 lang=self.lang,
                 content=self.content,
+                sort=self.sort,
                 output_dir=self.output_dir,
                 instance=instance,
             )
@@ -170,9 +186,24 @@ class TestAnnasEbook:
                 ext=self.ext,
                 lang=self.lang,
                 content=self.content,
+                sort=self.sort,
                 output_dir=self.output_dir,
             )
             assert ebook.instance == AnnasEbook._ANNAS_ORG_URL
+
+    @pytest.mark.parametrize(
+        "sort", [("newest",), ("oldest",), ("smallest",), ("largest",)]
+    )
+    def test_sort(self, sort):
+        ebook = AnnasEbook(
+            q=self.q,
+            ext=self.ext,
+            lang=self.lang,
+            content=self.content,
+            sort=sort,
+            output_dir=self.output_dir,
+        )
+        assert ebook._search_params["sort"] == sort
 
     @pytest.mark.parametrize(
         "source, instance, expected_dict",
@@ -265,6 +296,7 @@ class TestAnnasEbook:
                 ext=self.ext,
                 lang=self.lang,
                 content=self.content,
+                sort=self.sort,
                 output_dir=self.output_dir,
                 instance=instance,
             )
@@ -276,6 +308,7 @@ class TestAnnasEbook:
                 ext=self.ext,
                 lang=self.lang,
                 content=self.content,
+                sort=self.sort,
                 output_dir=self.output_dir,
             )
             mocker.patch.object(ebook, "_current_source", source)
@@ -301,6 +334,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         mocker.patch.object(
@@ -310,10 +344,11 @@ class TestAnnasEbook:
         assert ebook._determine_link() == expected_link
 
     @pytest.mark.parametrize(
-        "ext, lang, content, link, _current_source, _selected_result, _scrape_key, expected_url",
+        "ext, lang, content, sort, link, _current_source, _selected_result, _scrape_key, expected_url",
         [
             (
                 "err.ext",
+                "",
                 "",
                 "",
                 None,
@@ -324,6 +359,7 @@ class TestAnnasEbook:
             ),
             (
                 "epub",
+                "",
                 "",
                 "",
                 None,
@@ -336,6 +372,7 @@ class TestAnnasEbook:
                 "epub,pdf",
                 "",
                 "",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
@@ -345,6 +382,7 @@ class TestAnnasEbook:
             (
                 "epub",
                 "en",
+                "",
                 "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
@@ -356,6 +394,7 @@ class TestAnnasEbook:
                 "epub,mobi",
                 "en",
                 "nf,f",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
@@ -366,26 +405,29 @@ class TestAnnasEbook:
                 "pdf",
                 "",
                 "",
+                "largest",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
                 "search_page_scrape",
-                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=pdf",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=pdf&sort=largest",
             ),
             (
                 "pdf",
                 "en,es,zh-Hant",
                 "m",
+                "newest",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
                 "search_page_scrape",
-                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=pdf&lang=en&lang=es&lang=zh-Hant&content=magazine",
+                f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=pdf&lang=en&lang=es&lang=zh-Hant&content=magazine&sort=newest",
             ),
             (
                 "xox",
                 "en,es,zh-Hant",
                 "m",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
@@ -396,6 +438,7 @@ class TestAnnasEbook:
                 "xox,epub",
                 "en,es,zh-Hant",
                 "m",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
@@ -406,6 +449,7 @@ class TestAnnasEbook:
                 "pdf,cbr",
                 "en,es,zh-Hant",
                 "xoxo",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
@@ -413,6 +457,7 @@ class TestAnnasEbook:
                 f"{AnnasEbook._SOURCE_DICT[AnnasEbook._SOURCE_ANNAS].get('url')}/search?q={SEARCH}&ext=pdf&ext=cbr&lang=en&lang=es&lang=zh-Hant",
             ),
             (
+                "",
                 "",
                 "",
                 "",
@@ -425,6 +470,7 @@ class TestAnnasEbook:
             (
                 "",
                 "en,es",
+                "",
                 "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
@@ -436,6 +482,7 @@ class TestAnnasEbook:
                 "",
                 "",
                 "cb,u",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
@@ -446,6 +493,7 @@ class TestAnnasEbook:
                 "",
                 "",
                 "cb,xoxo",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
@@ -456,6 +504,7 @@ class TestAnnasEbook:
                 "",
                 "",
                 "xoxo",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {},
@@ -466,6 +515,7 @@ class TestAnnasEbook:
                 "pdf",
                 "en,es",
                 "sd",
+                "smallest",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {"link": "https://books.google.com"},
@@ -473,6 +523,7 @@ class TestAnnasEbook:
                 "https://books.google.com",
             ),
             (
+                "",
                 "",
                 "",
                 "",
@@ -484,6 +535,7 @@ class TestAnnasEbook:
             ),
             (
                 "epub",
+                "",
                 "",
                 "",
                 None,
@@ -496,6 +548,7 @@ class TestAnnasEbook:
                 "",
                 "",
                 "nf,u,f",
+                "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {"link": "http://shady-books.google.com"},
@@ -506,6 +559,7 @@ class TestAnnasEbook:
                 "pdf",
                 "",
                 "",
+                "oldest",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
                 {"link": "http://shady-books.google.com"},
@@ -515,6 +569,7 @@ class TestAnnasEbook:
             (
                 "",
                 "en,es",
+                "",
                 "",
                 None,
                 AnnasEbook._SOURCE_ANNAS,
@@ -526,6 +581,7 @@ class TestAnnasEbook:
                 "epub",
                 "en,es",
                 "nf",
+                "",
                 "https://solid-books.google.com",
                 AnnasEbook._LIBGEN_LI,
                 {"link": "/md5/234890238402380423"},
@@ -534,6 +590,7 @@ class TestAnnasEbook:
             ),
             (
                 "epub",
+                "",
                 "",
                 "",
                 None,
@@ -546,6 +603,7 @@ class TestAnnasEbook:
                 "",
                 "en,es",
                 "",
+                "",
                 "http://big-solid-books.google.com/?md5=32480238402384023",
                 AnnasEbook._LIBGEN_RS,
                 {},
@@ -553,6 +611,7 @@ class TestAnnasEbook:
                 "http://big-solid-books.google.com/?md5=32480238402384023",
             ),
             (
+                "",
                 "",
                 "",
                 "",
@@ -569,6 +628,7 @@ class TestAnnasEbook:
         ext,
         lang,
         content,
+        sort,
         link,
         _current_source,
         _selected_result,
@@ -577,7 +637,12 @@ class TestAnnasEbook:
         mocker,
     ):
         ebook = AnnasEbook(
-            q=self.q, ext=ext, lang=lang, content=content, output_dir=self.output_dir
+            q=self.q,
+            ext=ext,
+            lang=lang,
+            content=content,
+            sort=sort,
+            output_dir=self.output_dir,
         )
         mocker.patch.object(ebook, "_current_source", _current_source)
         mocker.patch.object(ebook, "_selected_result", _selected_result)
@@ -603,6 +668,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         mocked_get = mocker.patch.object(requests, "get")
@@ -788,6 +854,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         mocker.patch.object(ebook, "_current_source", _current_source)
@@ -838,6 +905,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         if AnnasEbook._ENTRY_NOT_DISPLAYED in expected_str:
@@ -997,6 +1065,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         mocker.patch.object(ebook, "_scrape_key", _scrape_key)
@@ -1108,6 +1177,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         mocker.patch.object(ebook, "_current_source", _current_source)
@@ -1177,6 +1247,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         spy_echo = mocker.spy(click, "echo")
@@ -1237,6 +1308,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         mocked__to_filesystem = mocker.patch.object(ebook, "_to_filesystem")
@@ -1450,6 +1522,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         mocked_get = mocker.patch.object(requests, "get")
@@ -1566,6 +1639,7 @@ class TestAnnasEbook:
             ext=self.ext,
             lang=self.lang,
             content=self.content,
+            sort=self.sort,
             output_dir=self.output_dir,
         )
         mocked_launch_browser = mocker.patch.object(click, "launch")

@@ -67,6 +67,17 @@ def cinema():
     ),
 )
 @click.option(
+    "-s",
+    "--sort",
+    type=click.Choice(AnnasEbook._SORT_ENTRIES),
+    help=(
+        "Preferred sorting of search results for ebooks. By "
+        "default search results are sorted by most relevant results. "
+        "Sort by: Newest entries, oldest entries, entries with the "
+        "smallest size, entries with the largest size."
+    ),
+)
+@click.option(
     "-i",
     "--instance",
     type=click.Choice(AnnasEbook._ANNAS_URLS.keys()),
@@ -79,7 +90,7 @@ def cinema():
     ),
 )
 @click.argument("q", nargs=-1)
-def ebook(q, ext, lang, content, output_dir, instance):
+def ebook(q, ext, lang, content, sort, output_dir, instance):
     """Search and download an ebook available through Anna's Archive
 
     ex: getdat ebook <Search>
@@ -91,6 +102,7 @@ def ebook(q, ext, lang, content, output_dir, instance):
         ext=ext,
         lang=lang,
         content=content,
+        sort=sort,
         output_dir=output_dir,
         instance=instance,
     )
