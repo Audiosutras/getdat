@@ -5,7 +5,7 @@ description = "A command line utility for getting resources available online"
 homepage = "https://audiosutras.github.io/getdat/"
 repository = "https://github.com/Audiosutras/getdat"
 keywords = ["cli", "books", "movies", "episodes", "anna's archive", "movie-web", "web scraper"]
-authors = ["Christopher Dixon <christopher.snipes.dixon@gmail.com>"]
+authors = ["Christopher Dixon <chrisdixononcode@gmail.com>"]
 readme = "docs/ReadMe.md"
 packages = [{include = "getdat", from = "src"}]
 
