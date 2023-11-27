@@ -1,6 +1,4 @@
-# *ATTENTION* - Anna's Archive enforces web scraping limits through Cloudflare. The `ebook` command may return `No Search Results` found. A fix is in the works, and a long term solution is [hosting an instance of Anna's Archive](https://annas-software.org/AnnaArchivist/annas-archive) with [community support](https://chrisdixononcode.dev/support). Reach out directly to [Anna's Archive email](AnnaArchivist@proton.me) for more questions.
-
-## "Its cool when they do it. Its a problem when I do it. Fuck 'em" - Finesse2Tymes
+# *ATTENTION* - Anna's Archive enforces web scraping blocks through Cloudflare. The site is also subject to change. The `ebook` command may return `No Search Results` found. A fix is in the works that may involve a new project and archiving this one. A long term solution is [hosting an instance of Anna's Archive](https://annas-software.org/AnnaArchivist/annas-archive) with [community support](https://chrisdixononcode.dev/support) or possibly creating a cli by forking the main repo and building an api.
 
 
 <div align="center">
