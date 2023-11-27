@@ -1,3 +1,8 @@
+# *ATTENTION* - Anna's Archive enforces web scraping limits through Cloudflare. The `ebook` command may return `No Search Results` found. A fix is in the works, and a long term solution is [hosting an instance of Anna's Archive](https://annas-software.org/AnnaArchivist/annas-archive) with [community support](https://chrisdixononcode.dev/support). Reach out directly to [Anna's Archive email](AnnaArchivist@proton.me) for more questions.
+
+## "Its cool when they do it. Its a problem when I do it. Fuck 'em" - Finesse2Tymes
+
+
 <div align="center">
     <h1>GetDat</h1>
     <p><i>A command line utility for getting resources available online</i></p>
@@ -24,8 +29,6 @@
     <img alt="GitHub issues" src="https://img.shields.io/github/issues/Audiosutras/getdat">
   </a>
 </div>
-
-# *ATTENTION* - Anna's Archive enforces web scraping limits through Cloudflare. The `ebook` command may return `No Search Results` found. A fix is in the works, and a long term solution is [hosting an instance of Anna's Archive](https://annas-software.org/AnnaArchivist/annas-archive) with [community support](https://chrisdixononcode.dev/support). Reach out directly to [Anna's Archive email](AnnaArchivist@proton.me) for more questions.
 
 Table of Contents
 
