@@ -100,12 +100,14 @@ def ebook(q, ext, lang, content, sort, output_dir, instance):
 
     click.echo(
         click.style(
-            "Anna's Archive doesn't want to allow web scraping of there site. "
-            "It's cool of they do it! Its problem when I do it! Fuck em. "
-            "Stay tuned for new versions with fixes: https://getdat.chrisdixononcode.dev "
-            "You can send an email to AnnaArchivist@proton.me for more information."
-        ),
-        fg="bright_red",
+            (
+                "Anna's Archive doesn't want to allow web scraping of there site. "
+                "It's cool of they do it! Its problem when I do it! Fuck em. "
+                "Stay tuned for new versions with fixes: https://getdat.chrisdixononcode.dev "
+                "You can send an email to AnnaArchivist@proton.me for more information."
+            ),
+            fg="bright_red",
+        )
     )
     click.launch("https://annas-archive.org")
     # ebook = AnnasEbook(
