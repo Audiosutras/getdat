@@ -25,6 +25,8 @@
   </a>
 </div>
 
+*ATTENTION* - Anna's Archive enforces web scraping limits. The `ebook` command may return `No Search Results` found. A fix is in the works, and a long term solution is [hosting an instance of Anna's Archive](https://annas-software.org/AnnaArchivist/annas-archive) with [community support](https://chrisdixononcode.dev/support).
+
 Table of Contents
 
 - [Installation Methods](#installation-methods)
