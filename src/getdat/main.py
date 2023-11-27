@@ -97,26 +97,13 @@ def ebook(q, ext, lang, content, sort, output_dir, instance):
     """
     if not q:
         print_help(EBOOK_ERROR_MSG)
-
-    click.echo(
-        click.style(
-            (
-                "Anna's Archive doesn't want to allow web scraping of there site. "
-                "It's cool of they do it! Its problem when I do it! Fuck em. "
-                "Stay tuned for new versions with fixes: https://getdat.chrisdixononcode.dev "
-                "You can send an email to AnnaArchivist@proton.me for more information."
-            ),
-            fg="bright_red",
-        )
+    ebook = AnnasEbook(
+        q=q,
+        ext=ext,
+        lang=lang,
+        content=content,
+        sort=sort,
+        output_dir=output_dir,
+        instance=instance,
     )
-    click.launch("https://annas-archive.org")
-    # ebook = AnnasEbook(
-    #     q=q,
-    #     ext=ext,
-    #     lang=lang,
-    #     content=content,
-    #     sort=sort,
-    #     output_dir=output_dir,
-    #     instance=instance,
-    # )
-    # ebook.run()
+    ebook.run()

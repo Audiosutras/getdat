@@ -37,5 +37,5 @@ jobs:
       - name: Style Guide Check & Code Check
         run: poetry run pre-commit run -a
 
-      # - name: Run Pytest & Output Coverage
-      #   run: poetry run pytest -v --cov=. tests/
+      - name: Run Pytest & Output Coverage
+        run: poetry run pytest -v --cov=. tests/
