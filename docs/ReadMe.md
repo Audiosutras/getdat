@@ -18,14 +18,14 @@
     <img class="p-2" alt="PyPI - Downloads" src="https://img.shields.io/pypi/dw/getdat?logo=pypi">
   </a>
   <a href="https://github.com/Audiosutras/getdat/actions/workflows/ci.yml?query=branch%3Amaster" alt="Link to CI jobs for master branch">
-    <img class="p-2" alt="CI" src="https://github.com/Audiosutras/getdat/actions/workflows/ci.yml/badge.svg?branch=master">
+    <img class="p-2" alt="CI" ssrc="https://github.com/Audiosutras/getdat/actions/workflows/ci.yml/badge.svg?branch=master">
   </a>
   <a href="https://github.com/Audiosutras/getdat" alt="Link to Github Issues">
     <img alt="GitHub issues" src="https://img.shields.io/github/issues/Audiosutras/getdat">
   </a>
 </div>
 
-*ATTENTION* - Anna's Archive enforces web scraping limits. The `ebook` command may return `No Search Results` found. A fix is in the works, and a long term solution is [hosting an instance of Anna's Archive](https://annas-software.org/AnnaArchivist/annas-archive) with [community support](https://chrisdixononcode.dev/support).
+# *ATTENTION* - Anna's Archive enforces web scraping limits through Cloudflare. The `ebook` command may return `No Search Results` found. A fix is in the works, and a long term solution is [hosting an instance of Anna's Archive](https://annas-software.org/AnnaArchivist/annas-archive) with [community support](https://chrisdixononcode.dev/support). Reach out directly to [Anna's Archive email](AnnaArchivist@proton.me) for more questions.
 
 Table of Contents
 
