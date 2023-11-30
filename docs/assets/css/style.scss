@@ -39,6 +39,14 @@ p,ul,ol {
     padding: 1rem 0rem;
 }
 
+ol {
+    list-style-type: decimal !important;
+    li {
+        counter-increment: step-counter;
+        content: counter(step-counter);
+    }
+}
+
 li {
     margin: 1rem 2rem;
 }
