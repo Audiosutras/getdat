@@ -7,10 +7,10 @@
     <link rel="shortcut icon" type="image/sg" href="https://d2ixboot0418ao.cloudfront.net/logoSymbol.svg"/>
     <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    {% include head-custom.html %}
     <!-- Add Tailwind CSS-->
     <script src="https://cdn.tailwindcss.com"></script>
-{% seo %}
+    {% include head-custom-google-analytics.html %}
+    {% seo %}
   </head>
 
   <body class="bg-black flex min-h-screen flex-col justify-between sm:px-8 md:px-24">
