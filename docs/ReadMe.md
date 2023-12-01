@@ -20,8 +20,8 @@
   <a href="https://pypi.org/project/getdat/" alt="Link to PyPi package homepage">
     <img class="p-2" alt="PyPI - Downloads" src="https://img.shields.io/pypi/dw/getdat?logo=pypi">
   </a>
-  <a href="https://github.com/Audiosutras/getdat/actions/workflows/ci.yml?query=branch%3Amaster" alt="Link to CI jobs for master branch">
-    <img class="p-2" alt="CI" ssrc="https://github.com/Audiosutras/getdat/actions/workflows/ci.yml/badge.svg?branch=master">
+  <a href="https://github.com/Audiosutras/getdat/actions/workflows/ci.yml?query=branch=master" alt="Link to CI jobs for master branch">
+    <img class="p-2" alt="CI" src="https://github.com/Audiosutras/getdat/actions/workflows/ci.yml/badge.svg?branch=master">
   </a>
   <a href="https://github.com/Audiosutras/getdat" alt="Link to Github Issues">
     <img alt="GitHub issues" src="https://img.shields.io/github/issues/Audiosutras/getdat">
