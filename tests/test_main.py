@@ -3,9 +3,9 @@ import click
 from unittest.mock import Mock
 from click.testing import CliRunner
 from src import getdat
-from src.getdat.main import cli, sport, cinema, ebook
+from src.getdat.main import cli, job, sport, cinema, ebook
 from src.getdat.utils import AnnasEbook
-from src.getdat.constants import EBOOK_ERROR_MSG, MOVIE_WEB, TOTALSPORTK
+from src.getdat.constants import EBOOK_ERROR_MSG, MOVIE_WEB, TOTALSPORTK, BRAINTRUST
 
 
 class TestCLI:
@@ -15,6 +15,16 @@ class TestCLI:
         result = self.runner.invoke(cli)
         homepage = "https://getdat.chrisdixononcode.dev"
         assert homepage in result.output
+
+
+class TestJob:
+    runner = CliRunner()
+
+    def test_sport_launches_browser(self, mocker):
+        browser_launch = mocker.patch.object(click, "launch")
+        result = self.runner.invoke(job)
+        assert result.exit_code == 0
+        browser_launch.assert_called_once_with(BRAINTRUST)
 
 
 class TestSport:

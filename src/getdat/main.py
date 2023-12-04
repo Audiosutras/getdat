@@ -1,6 +1,6 @@
 import click
 from .utils import AnnasEbook, print_help
-from .constants import EBOOK_ERROR_MSG, MOVIE_WEB, TOTALSPORTK
+from .constants import EBOOK_ERROR_MSG, MOVIE_WEB, TOTALSPORTK, BRAINTRUST
 
 
 @click.group(
@@ -9,6 +9,12 @@ from .constants import EBOOK_ERROR_MSG, MOVIE_WEB, TOTALSPORTK
 def cli():
     """A command line utility for getting resources available online"""
     pass
+
+
+@cli.command()
+def job():
+    """Launches braintrust, the job board powered by blockchain, in your default browser"""
+    click.launch(BRAINTRUST)
 
 
 @cli.command()
