@@ -4,4 +4,4 @@ MOVIE_WEB = "https://movie-web.app"
 
 TOTALSPORTK = "https://www.totalsportk.org/"
 
-BRAINTRUST = "https://bit.ly/braintrust-gigs-talent-search"
+BRAINTRUST = "https://app.usebraintrust.com/r/chris1275/"
