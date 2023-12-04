@@ -52,6 +52,12 @@ From Head commit of Repository:
 
 ## Commands
 
+### Job
+Launches [Braintrust](https://bit.ly/braintrust-gigs-talent-search), the job board powered by blockchain, in your default browser
+
+### Sport
+Launches [Totalsportk](https://www.totalsportk.org/) in your default browser
+
 ### Cinema
 Launches [movie-web.app](https://movie-web.app/search/movie) in your default browser
 
