@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "getdat"
-version = "0.1.9"
+version = "0.2.2"
 description = "A command line utility for getting resources available online"
 homepage = "https://audiosutras.github.io/getdat/"
 repository = "https://github.com/Audiosutras/getdat"
